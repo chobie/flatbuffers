@@ -32,7 +32,6 @@ namespace php {
       std::string *code_ptr);
     static std::string GenTypeBasic(const Type &type);
     static std::string GenTypeGet(const Type &type);
-    static std::string TypeName(const FieldDef &field);
 
     // Ensure that a type is prefixed with its namespace whenever it is used
     // outside of its namespace.
