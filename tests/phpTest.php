@@ -70,9 +70,9 @@ function main()
     // Test it:
     test_buffer($assert, $fbb->dataBuffer());
 
-//TODO
-//    testUnicode();
-//    fuzzTest1();
+    testByteBuffer($assert);
+    fuzzTest1($assert);
+//    testUnicode($assert);
 
     echo 'FlatBuffers php test: completed successfully' . PHP_EOL;
 }
@@ -135,49 +135,398 @@ function test_buffer(Assert $assert, \FlatBuffers\ByteBuffer $bb) {
     $assert->strictEqual($monster->GetTestbool(), false);
 }
 
-// TODO
-function testUnicode(Assert $assert) {
-    $correct = file_get_contents('unicode_test.mon');
-    $json = json_decode(file_get_contents('unicode_test.json'));
+//function testUnicode(Assert $assert) {
+//    // missing unicode_test.mon, implemented later
+//    $correct = file_get_contents('unicode_test.mon');
+//    $json = json_decode(file_get_contents('unicode_test.json'));
+//
+//    // Test reading
+//    $bb = flatbuffers\ByteBuffer::Wrap($correct);
+//    $monster = \MyGame\Example\Monster::GetRootAsMonster($bb);
+//    $assert->strictEqual($monster->GetName(), $json["name"]);
+//
+//    //$assert->deepEqual(new Buffer(monster.name(flatbuffers.Encoding.UTF8_BYTES)), new Buffer(json.name));
+//    //assert.strictEqual(monster.testarrayoftablesLength(), json.testarrayoftables.length);
+//    foreach ($json["testarrayoftables"]as $i => $table) {
+//        $value = $monster->GetTestArrayOfTables($i);
+//        $assert->strictEqual($value->GetName(), $table["name"]);
+//        //assert.deepEqual(new Buffer(value.name(flatbuffers.Encoding.UTF8_BYTES)), new Buffer(table.name));
+//    }
+//    $assert->strictEqual($monster->GetTestarrayofstringLength(), $json["testarrayofstring"]["length"]);
+//    foreach ($json["testarrayofstring"] as $i => $string) {
+//        $assert->strictEqual($monster->GetTestarrayofstring($i), $string);
+//        //assert.deepEqual(new Buffer(monster.testarrayofstring(i, flatbuffers.Encoding.UTF8_BYTES)), new Buffer(string));
+//    }
+//
+//    // Test writing
+//    $fbb = new FlatBuffers\FlatBufferBuilder(1);
+//    $name = $fbb->CreateString($json["name"]);
+//    $testarrayoftablesOffsets = array_map(function($table) use($fbb) {
+//        $name = $fbb->CreateString($table["name"]);
+//        \MyGame\Example\Monster::StartMonster($fbb);
+//        \MyGame\Example\Monster::AddName($fbb, $name);
+//        return \MyGame\Example\Monster::EndMonster($fbb);
+//    }, $json["testarrayoftables"]);
+//    $testarrayoftablesOffset = \MyGame\Example\Monster::CreateTestarrayoftablesVector($fbb,
+//            $testarrayoftablesOffsets);
+////    $testarrayofstringOffset = \MyGame\Example\Monster::CreateTestarrayofstringVector($fbb,
+////            $json["testarrayofstring"].map(function(string) { return fbb.createString(string); }));
+//
+//    \MyGame\Example\Monster::startMonster($fbb);
+//    \MyGame\Example\Monster::addTestarrayofstring($fbb, $testarrayoftablesOffset);
+//    \MyGame\Example\Monster::addTestarrayoftables($fbb, $testarrayoftablesOffset);
+//    \MyGame\Example\Monster::addName($fbb, $name);
+//    \MyGame\Example\Monster::finishMonsterBuffer($fbb, \MyGame\Example\Monster::endMonster($fbb));
+//    //;assert.deepEqual(new Buffer(fbb.asUint8Array()), correct);
+//}
 
-    // Test reading
-    $bb = flatbuffers\ByteBuffer::Wrap($correct);
-    $monster = \MyGame\Example\Monster::GetRootAsMonster($bb);
-    $assert->strictEqual($monster->GetName(), $json["name"]);
+// Low level stress/fuzz test: serialize/deserialize a variety of
+// different kinds of data in different combinations
+function fuzzTest1(Assert $assert)
+{
 
-    //$assert->deepEqual(new Buffer(monster.name(flatbuffers.Encoding.UTF8_BYTES)), new Buffer(json.name));
-    //assert.strictEqual(monster.testarrayoftablesLength(), json.testarrayoftables.length);
-    foreach ($json["testarrayoftables"]as $i => $table) {
-        $value = $monster->GetTestArrayOfTables($i);
-        $assert->strictEqual($value->GetName(), $table["name"]);
-        //assert.deepEqual(new Buffer(value.name(flatbuffers.Encoding.UTF8_BYTES)), new Buffer(table.name));
+    // Values we're testing against: chosen to ensure no bits get chopped
+    // off anywhere, and also be different from eachother.
+    $bool_val = true;
+    $char_val = -127; // 0x81
+    $uchar_val = 0xFF;
+    $short_val = -32222; // 0x8222;
+    $ushort_val = 0xFEEE;
+    $int_val = 0x83333333 | 0;
+    // for now
+    $uint_val = 1;
+    $long_val = 2;
+    $ulong_val = 3;
+
+//    var uint_val   = 0xFDDDDDDD;
+//    var long_val   = new flatbuffers.Long(0x44444444, 0x84444444);
+//    var ulong_val  = new flatbuffers.Long(0xCCCCCCCC, 0xFCCCCCCC);
+
+    $float_val = 3.14159;
+    $double_val = 3.14159265359;
+
+    $test_values_max = 11;
+    $fields_per_object = 4;
+    // current implementation is not good at encoding.
+    $num_fuzz_objects = 1000;
+    $builder = new FlatBuffers\FlatBufferBuilder(1);
+
+    // can't use same implementation due to PHP_INTMAX overflow issue.
+    // we use mt_rand function to reproduce fuzzy test.
+    mt_srand(48271);
+    $objects = array();
+    // Generate num_fuzz_objects random objects each consisting of
+    // fields_per_object fields, each of a random type.
+    for ($i = 0; $i < $num_fuzz_objects; $i++) {
+        $builder->startObject($fields_per_object);
+        for ($f = 0; $f < $fields_per_object; $f++) {
+            $choice = mt_rand() % $test_values_max;
+            switch ($choice) {
+                case 0:
+                    $builder->addBoolX($f, $bool_val, 0);
+                    break;
+                case 1:
+                    $builder->addByteX($f, $char_val, 0);
+                    break;
+                case 2:
+                    $builder->addSbyteX($f, $uchar_val, 0);
+                    break;
+                case 3:
+                    $builder->addShortX($f, $short_val, 0);
+                    break;
+                case 4:
+                    $builder->addUshortX($f, $ushort_val, 0);
+                    break;
+                case 5:
+                    $builder->addIntX($f, $int_val, 0);
+                    break;
+                case 6:
+                    $builder->addUintX($f, $uint_val, 0);
+                    break;
+                case 7:
+                    $builder->addLongX($f, $long_val, 0);
+                    break;
+                case 8:
+                    $builder->addUlongX($f, $ulong_val, 0);
+                    break;
+                case 9:
+                    $builder->addFloatX($f, $float_val, 0);
+                    break;
+                case 10:
+                    $builder->addDoubleX($f, $double_val, 0);
+                    break;
+            }
+        }
+        $objects[] = $builder->endObject();
     }
-    $assert->strictEqual($monster->GetTestarrayofstringLength(), $json["testarrayofstring"]["length"]);
-    foreach ($json["testarrayofstring"] as $i => $string) {
-        $assert->strictEqual($monster->GetTestarrayofstring($i), $string);
-        //assert.deepEqual(new Buffer(monster.testarrayofstring(i, flatbuffers.Encoding.UTF8_BYTES)), new Buffer(string));
+    $builder->prep(8, 0); // Align whole buffer.
+
+    mt_srand(48271); // Reset
+    $builder->finish($objects[count($objects) - 1]);
+
+    $view = \FlatBuffers\ByteBuffer::Wrap($builder->sizedByteArray());
+    for ($i = 0; $i < $num_fuzz_objects; $i++) {
+        $offset = $view->Capacity() - $objects[$i];
+        for ($f = 0; $f < $fields_per_object; $f++) {
+            $choice = mt_rand() % $test_values_max;
+            $vtable_offset = fieldIndexToOffset($f);
+            $vtable = $offset - $view->GetInt($offset);
+            $assert->ok($vtable_offset < $view->GetShort($vtable));
+            $field_offset = $offset + $view->GetShort($vtable + $vtable_offset);
+            switch ($choice) {
+                case 0:
+                    $assert->strictEqual(!!$view->GetBool($field_offset), $bool_val);
+                    break;
+                case 1:
+                    $assert->strictEqual($view->GetSByte($field_offset), $char_val);
+                    break;
+                case 2:
+                    $assert->strictEqual($view->GetByte($field_offset), $uchar_val);
+                    break;
+                case 3:
+                    $assert->strictEqual($view->GetShort($field_offset), $short_val);
+                    break;
+                case 4:
+                    $assert->strictEqual($view->GetUShort($field_offset), $ushort_val);
+                    break;
+                case 5:
+                    $assert->strictEqual($view->GetInt($field_offset), $int_val);
+                    break;
+                case 6:
+                    $assert->strictEqual($view->GetUInt($field_offset), $uint_val);
+                    break;
+                case 7:
+                    if (PHP_INT_SIZE <= 4) break;
+                    $assert->strictEqual($view->GetLong($field_offset), $long_val);
+                    break;
+                case 8:
+                    if (PHP_INT_SIZE <= 4) break;
+                    $assert->strictEqual($view->GetUlong($field_offset), $ulong_val);
+                    break;
+                case 9:
+                    $assert->strictEqual(floor($view->GetFloat($field_offset)), floor($float_val));
+                    break;
+                case 10:
+                    $assert->strictEqual($view->GetDouble($field_offset), $double_val);
+                    break;
+            }
+        }
+    }
+}
+
+function fieldIndexToOffset($field_id) {
+    // Should correspond to what EndTable() below builds up.
+    $fixed_fields = 2;  // Vtable size and Object Size.
+    return ($field_id + $fixed_fields) * 2;
+}
+
+function testByteBuffer(Assert $assert) {
+
+    //Test: ByteBuffer_Length_MatchesBufferLength
+    $buffer = str_repeat("\0", 100);
+    $uut  = FlatBuffers\ByteBuffer::Wrap($buffer);
+    $assert->Equal($uut->Capacity(), strlen($buffer));
+
+    //Test: ByteBuffer_PutBytePopulatesBufferAtZeroOffset
+    $buffer = "\0";
+    $uut = FlatBuffers\ByteBuffer::wrap($buffer);
+    $uut->PutByte(0, "\x63"); // 99
+    $assert->Equal("\x63", $buffer[0]); // don't share buffer as php user might confuse reference.
+
+    //Test: ByteBuffer_PutByteCannotPutAtOffsetPastLength
+    $buffer = "\0";
+    $uut = FlatBuffers\ByteBuffer::wrap($buffer);
+    $assert->Throws(new OutOfRangeException(), function()  use ($uut) {
+        $uut->PutByte(1, "\x63"); // 99
+    });
+
+    //Test: ByteBuffer_PutShortPopulatesBufferCorrectly
+    $buffer = str_repeat("\0", 2);
+    $uut = \FlatBuffers\ByteBuffer::Wrap($buffer);
+    $uut->PutShortX(0, 1);
+
+    // Ensure Endiannes was written correctly
+    $assert->Equal(chr(0x01), $uut->_buffer[0]);
+    $assert->Equal(chr(0x00), $uut->_buffer[1]);
+
+    //Test: ByteBuffer_PutShortCannotPutAtOffsetPastLength
+    $buffer = "\0";
+    $uut = \FlatBuffers\ByteBuffer::Wrap($buffer);
+    $assert->Throws(new OutOfRangeException(), function()  use ($uut) {
+        $uut->PutShortX(2, "\x63"); // 99
+    });
+
+    //Test: ByteBuffer_PutShortChecksLength
+    $buffer = "\0";
+    $uut = \FlatBuffers\ByteBuffer::Wrap($buffer);
+    $assert->Throws(new OutOfRangeException(), function()  use ($uut) {
+        $uut->PutShortX(0, "\x63"); // 99
+    });
+
+    //Test: ByteBuffer_PutShortChecksLengthAndOffset
+    $buffer = str_repeat("\0", 2);
+    $uut = \FlatBuffers\ByteBuffer::Wrap($buffer);
+    $assert->Throws(new OutOfRangeException(), function()  use ($uut) {
+        $uut->PutShortX(1, "\x63"); // 99
+    });
+
+    //Test: ByteBuffer_PutIntPopulatesBufferCorrectly
+    $buffer = str_repeat("\0", 4);
+    $uut = \FlatBuffers\ByteBuffer::Wrap($buffer);
+    $uut->PutIntX(0, 0x0A0B0C0D);
+    $assert->Equal(chr(0x0D), $uut->_buffer[0]);
+    $assert->Equal(chr(0x0C), $uut->_buffer[1]);
+    $assert->Equal(chr(0x0B), $uut->_buffer[2]);
+    $assert->Equal(chr(0x0A), $uut->_buffer[3]);
+
+    //Test: ByteBuffer_PutIntCannotPutAtOffsetPastLength
+    $buffer = str_repeat("\0", 4);
+    $uut = \FlatBuffers\ByteBuffer::Wrap($buffer);
+    $assert->Throws(new OutOfRangeException(), function()  use ($uut) {
+        $uut->PutIntX(2, 0x0A0B0C0D);
+    });
+
+    //Test: ByteBuffer_PutIntChecksLength
+    $buffer = str_repeat("\0", 1);
+    $uut = \FlatBuffers\ByteBuffer::Wrap($buffer);
+    $assert->Throws(new OutOfRangeException(), function()  use ($uut) {
+        $uut->PutIntX(0, 0x0A0B0C0D);
+    });
+
+    //Test: ByteBuffer_PutIntChecksLengthAndOffset
+    $buffer = str_repeat("\0", 4);
+    $uut = \FlatBuffers\ByteBuffer::Wrap($buffer);
+    $assert->Throws(new OutOfRangeException(), function()  use ($uut) {
+        $uut->PutIntX(2, 0x0A0B0C0D);
+    });
+
+    if (PHP_INT_SIZE > 4) {
+        //Test: ByteBuffer_PutLongPopulatesBufferCorrectly
+        $buffer = str_repeat("\0", 8);
+        $uut = \FlatBuffers\ByteBuffer::Wrap($buffer);
+        $uut->PutLongX(0, 0x010203040A0B0C0D);
+        $assert->Equal(chr(0x0D), $uut->_buffer[0]);
+        $assert->Equal(chr(0x0C), $uut->_buffer[1]);
+        $assert->Equal(chr(0x0B), $uut->_buffer[2]);
+        $assert->Equal(chr(0x0A), $uut->_buffer[3]);
+        $assert->Equal(chr(0x04), $uut->_buffer[4]);
+        $assert->Equal(chr(0x03), $uut->_buffer[5]);
+        $assert->Equal(chr(0x02), $uut->_buffer[6]);
+        $assert->Equal(chr(0x01), $uut->_buffer[7]);
+
+        //Test: ByteBuffer_PutLongCannotPutAtOffsetPastLength
+        $buffer = str_repeat("\0", 8);
+        $uut = \FlatBuffers\ByteBuffer::Wrap($buffer);
+        $assert->Throws(new OutOfRangeException(), function()  use ($uut) {
+            $uut->PutLongX(2, 0x010203040A0B0C0D);
+        });
+
+        //Test: ByteBuffer_PutLongCannotPutAtOffsetPastLength
+        $buffer = str_repeat("\0", 1);
+        $uut = \FlatBuffers\ByteBuffer::Wrap($buffer);
+        $assert->Throws(new OutOfRangeException(), function()  use ($uut) {
+            $uut->PutLongX(0, 0x010203040A0B0C0D);
+        });
+
+
+        //Test: ByteBuffer_PutLongChecksLengthAndOffset
+        $buffer = str_repeat("\0", 8);
+        $uut = \FlatBuffers\ByteBuffer::Wrap($buffer);
+        $assert->Throws(new OutOfRangeException(), function()  use ($uut) {
+            $uut->PutLongX(2, 0x010203040A0B0C0D);
+        });
     }
 
-    // Test writing
-    $fbb = new FlatBuffers\FlatBufferBuilder(1);
-    $name = $fbb->CreateString($json["name"]);
-    $testarrayoftablesOffsets = array_map(function($table) use($fbb) {
-        $name = $fbb->CreateString($table["name"]);
-        \MyGame\Example\Monster::StartMonster($fbb);
-        \MyGame\Example\Monster::AddName($fbb, $name);
-        return \MyGame\Example\Monster::EndMonster($fbb);
-    }, $json["testarrayoftables"]);
-    $testarrayoftablesOffset = \MyGame\Example\Monster::CreateTestarrayoftablesVector($fbb,
-            $testarrayoftablesOffsets);
-//    $testarrayofstringOffset = \MyGame\Example\Monster::CreateTestarrayofstringVector($fbb,
-//            $json["testarrayofstring"].map(function(string) { return fbb.createString(string); }));
+    //Test: ByteBuffer_GetByteReturnsCorrectData
+    $buffer = str_repeat("\0", 1);
+    $buffer[0] = "\x63";
+    $uut = \FlatBuffers\ByteBuffer::Wrap($buffer);
+    $assert->Equal("\x63", $uut->Get(0));
 
-    \MyGame\Example\Monster::startMonster($fbb);
-    \MyGame\Example\Monster::addTestarrayofstring($fbb, $testarrayoftablesOffset);
-    \MyGame\Example\Monster::addTestarrayoftables($fbb, $testarrayoftablesOffset);
-    \MyGame\Example\Monster::addName($fbb, $name);
-    \MyGame\Example\Monster::finishMonsterBuffer($fbb, \MyGame\Example\Monster::endMonster($fbb));
-    //;assert.deepEqual(new Buffer(fbb.asUint8Array()), correct);
+    //Test: ByteBuffer_GetByteChecksOffset
+    $buffer = str_repeat("\0", 1);
+    $uut = \FlatBuffers\ByteBuffer::Wrap($buffer);
+    $assert->Throws(new OutOfRangeException(), function()  use ($uut) {
+        $uut->Get(1);
+    });
+
+    //Test: ByteBuffer_GetShortReturnsCorrectData
+    $buffer = str_repeat("\0", 2);
+    $buffer[0] = chr(0x01);
+    $buffer[1] = chr(0x00);
+    $uut = \FlatBuffers\ByteBuffer::Wrap($buffer);
+    $assert->Equal(1, $uut->GetShort(0));
+
+    //Test: ByteBuffer_GetShortChecksOffset
+    $buffer = str_repeat("\0", 2);
+    $uut = \FlatBuffers\ByteBuffer::Wrap($buffer);
+    $assert->Throws(new OutOfRangeException(), function()  use ($uut) {
+        $uut->GetShort(2);
+    });
+
+    //Test: ByteBuffer_GetShortChecksLength
+    $buffer = str_repeat("\0", 2);
+    $uut = \FlatBuffers\ByteBuffer::Wrap($buffer);
+    $assert->Throws(new OutOfRangeException(), function()  use ($uut) {
+        $uut->GetShort(1);
+    });
+
+    //Test: ByteBuffer_GetIntReturnsCorrectData
+    $buffer = str_repeat("\0", 4);
+    $buffer[0] = chr(0x0D);
+    $buffer[1] = chr(0x0C);
+    $buffer[2] = chr(0x0B);
+    $buffer[3] = chr(0x0A);
+    $uut = \FlatBuffers\ByteBuffer::Wrap($buffer);
+    $assert->Equal(0x0A0B0C0D, $uut->GetInt(0));
+
+    //Test: ByteBuffer_GetIntChecksOffset
+    $buffer = str_repeat("\0", 4);
+    $uut = \FlatBuffers\ByteBuffer::Wrap($buffer);
+    $assert->Throws(new OutOfRangeException(), function()  use ($uut) {
+        $uut->GetInt(4);
+    });
+
+    //Test: ByteBuffer_GetIntChecksLength
+    $buffer = str_repeat("\0", 2);
+    $uut = \FlatBuffers\ByteBuffer::Wrap($buffer);
+    $assert->Throws(new OutOfRangeException(), function()  use ($uut) {
+        $uut->GetInt(0);
+    });
+
+    if (PHP_INT_SIZE > 4) {
+        //Test: ByteBuffer_GetLongReturnsCorrectData
+        $buffer = str_repeat("\0", 8);
+        $buffer[0] = chr(0x0D);
+        $buffer[1] = chr(0x0C);
+        $buffer[2] = chr(0x0B);
+        $buffer[3] = chr(0x0A);
+        $buffer[4] = chr(0x04);
+        $buffer[5] = chr(0x03);
+        $buffer[6] = chr(0x02);
+        $buffer[7] = chr(0x01);
+        $uut = \FlatBuffers\ByteBuffer::Wrap($buffer);
+        $assert->Equal(0x010203040A0B0C0D, $uut->GetLong(0));
+    }
+
+    //Test: ByteBuffer_GetLongChecksOffset
+    $buffer = str_repeat("\0", 8);
+    $uut = \FlatBuffers\ByteBuffer::Wrap($buffer);
+    $assert->Throws(new OutOfRangeException(), function()  use ($uut) {
+        $uut->GetLong(8);
+    });
+
+    //Test: ByteBuffer_GetLongChecksLength
+    $buffer = str_repeat("\0", 7);
+    $uut = \FlatBuffers\ByteBuffer::Wrap($buffer);
+    $assert->Throws(new OutOfRangeException(), function()  use ($uut) {
+        $uut->GetLong(0);
+    });
+
+    // these tests are not necessary as we can't use unsafe operation.
+    //Test: ByteBuffer_ReverseBytesUshort
+    //Test: ByteBuffer_ReverseBytesUint
+    //Test: ByteBuffer_ReverseBytesUlong
 }
 
 class Assert {
@@ -197,6 +546,18 @@ class Assert {
     public function strictEqual($result, $expected, $message = "") {
         if ($result !== $expected) {
             throw new Exception(!empty($message) ? $message : "given the result {$result} is not strict equals as {$expected}");
+        }
+    }
+
+    public function Throws($class, Callable $callback) {
+        try {
+            $callback();
+
+            throw new \Exception("passed statement don't throw an exception.");
+        } catch (\Exception $e) {
+            if (get_class($e) != get_class($class)) {
+                throw new Exception("passed statement doesn't throw " . get_class($class) . ". throwws " . get_class($e));
+            }
         }
     }
 }

@@ -23,10 +23,10 @@ class ByteBuffer
     private $doublehelper = "";
     private $ulonghelper = "";
 
-    public static function Wrap($bytes)
+    public static function Wrap(&$bytes)
     {
         $bb = new ByteBuffer(0);
-        $bb->_buffer = $bytes;
+        $bb->_buffer = &$bytes;
 
         return $bb;
     }
@@ -105,33 +105,6 @@ class ByteBuffer
     }
 
     /**
-     * @param $input
-     * @throws \Exception
-     */
-    public static function ReverseUshortBytes($input)
-    {
-        throw new \Exception("Not implemented yet");
-    }
-
-    /**
-     * @param $input
-     * @throws \Exception
-     */
-    public static function ReverseUintBytes($input)
-    {
-        throw new \Exception("Not implemented yet");
-    }
-
-    /**
-     * @param $input
-     * @throws \Exception
-     */
-    public static function ReberseULongBytes($input)
-    {
-        throw new \Exception("Not implemented yet");
-    }
-
-    /**
      * write little endian value to the buffer.
      *
      * @param $offset
@@ -194,6 +167,8 @@ class ByteBuffer
      * @return mixed
      */
     public function PutSbyte($offset, $value) {
+        $length = strlen($value);
+        $this->AssertOffsetAndLength($offset, $length);
         return $this->_buffer[$offset] = $value;
     }
 
@@ -203,6 +178,8 @@ class ByteBuffer
      * @return mixed
      */
     public function PutByte($offset, $value) {
+        $length = strlen($value);
+        $this->AssertOffsetAndLength($offset, $length);
         return $this->_buffer[$offset] = $value;
     }
 
@@ -347,6 +324,7 @@ class ByteBuffer
      * @return mixed
      */
     public function Get($index) {
+        $this->AssertOffsetAndLength($index, 1);
         return $this->_buffer[$index];
     }
 

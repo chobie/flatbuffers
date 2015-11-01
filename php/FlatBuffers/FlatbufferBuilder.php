@@ -144,6 +144,7 @@ class FlatBufferBuilder
         $nbb = new ByteBuffer($new_buf_size);
 
         $nbb->SetPosition($new_buf_size - $old_buf_size);
+        //$nbb->_buffer = substr_replace($nbb->_buffer, $bb->_buffer, $new_buf_size - $old_buf_size, strlen($bb->_buffer));
         for ($i = $new_buf_size - $old_buf_size, $j = 0; $j < strlen($bb->_buffer); $i++, $j++) {
             $nbb->_buffer[$i] = $bb->_buffer[$j];
         }
@@ -204,6 +205,10 @@ class FlatBufferBuilder
      */
     public function putUint($x)
     {
+        if ($x > PHP_INT_MAX) {
+            throw new \OverflowException("your platform can't handling uint correctly. use 64bit machine.");
+        }
+
         $this->bb->PutUintX($this->space -= 4, $x);
     }
 
@@ -212,6 +217,10 @@ class FlatBufferBuilder
      */
     public function putLong($x)
     {
+        if ($x > PHP_INT_MAX) {
+            throw new \OverflowException("your platform can't handling long correctly. use 64bit machine.");
+        }
+
         $this->bb->PutLongX($this->space -= 8, $x);
     }
 
@@ -220,6 +229,10 @@ class FlatBufferBuilder
      */
     public function putUlong($x)
     {
+        if ($x > PHP_INT_MAX) {
+            throw new \OverflowException("your platform can't handling ulong correctly. this is php limitations. please wait extension release.");
+        }
+
         $this->bb->PutUlongX($this->space -= 8, $x);
     }
 
