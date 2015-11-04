@@ -14,10 +14,10 @@ class TestSimpleTableWithEnum extends Table
      * @param ByteBuffer $bb
      * @return TestSimpleTableWithEnum
      */
-    public static function GetRootAsTestSimpleTableWithEnum(ByteBuffer $bb)
+    public static function getRootAsTestSimpleTableWithEnum(ByteBuffer $bb)
     {
         $obj = new TestSimpleTableWithEnum();
-        return ($obj->Init($bb->GetInt($bb->GetPosition()) +$bb->GetPosition(), $bb)); 
+        return ($obj->init($bb->getInt($bb->getPosition()) + $bb->getPosition(), $bb));
     }
 
     public static function TestSimpleTableWithEnumIdentifier()
@@ -40,16 +40,17 @@ class TestSimpleTableWithEnum extends Table
      * @param ByteBuffer $_bb
      * @return TestSimpleTableWithEnum
      **/
-    public function Init($_i, ByteBuffer $_bb) {
+    public function init($_i, ByteBuffer $_bb)
+    {
         $this->bb_pos = $_i;
         $this->bb = $_bb;
-        return $this;        
+        return $this;
     }
 
     /**
      * @return sbyte
      */
-    public function GetColor()
+    public function getColor()
     {
         $o = $this->__offset(4);
         return $o != 0 ? $this->bb->GetSbyte($o + $this->bb_pos) : \MyGame\Example\Color::Green;
@@ -59,7 +60,8 @@ class TestSimpleTableWithEnum extends Table
      * @param FlatBufferBuilder $builder
      * @return void
      */
-    public static function StartTestSimpleTableWithEnum(FlatBufferBuilder $builder){ 
+    public static function startTestSimpleTableWithEnum(FlatBufferBuilder $builder)
+    {
         $builder->StartObject(1);
     }
 
@@ -67,11 +69,11 @@ class TestSimpleTableWithEnum extends Table
      * @param FlatBufferBuilder $builder
      * @return TestSimpleTableWithEnum
      */
-    public static function CreateTestSimpleTableWithEnum(FlatBufferBuilder $builder, $color)
+    public static function createTestSimpleTableWithEnum(FlatBufferBuilder $builder, $color)
     {
-        $builder->StartObject(1);
-        self::AddColor($builder, $color);
-        $o = $builder->EndObject();
+        $builder->startObject(1);
+        self::addColor($builder, $color);
+        $o = $builder->endObject();
         return $o;
     }
 
@@ -80,18 +82,18 @@ class TestSimpleTableWithEnum extends Table
      * @param sbyte
      * @return void
      */
-    public static function AddColor(FlatBufferBuilder $builder, $color){
-         $builder->AddSbyteX(0, $color, 2);
+    public static function AddColor(FlatBufferBuilder $builder, $color)
+    {
+        $builder->addSbyteX(0, $color, 2);
     }
 
     /**
      * @param FlatBufferBuilder $builder
      * @return int table offset
      */
-    public static function EndTestSimpleTableWithEnum(FlatBufferBuilder $builder){
-        $o = $builder->EndObject();
+    public static function endTestSimpleTableWithEnum(FlatBufferBuilder $builder)
+    {
+        $o = $builder->endObject();
         return $o;
     }
-
 }
-

@@ -14,10 +14,10 @@ class Stat extends Table
      * @param ByteBuffer $bb
      * @return Stat
      */
-    public static function GetRootAsStat(ByteBuffer $bb)
+    public static function getRootAsStat(ByteBuffer $bb)
     {
         $obj = new Stat();
-        return ($obj->Init($bb->GetInt($bb->GetPosition()) +$bb->GetPosition(), $bb)); 
+        return ($obj->init($bb->getInt($bb->getPosition()) + $bb->getPosition(), $bb));
     }
 
     public static function StatIdentifier()
@@ -40,13 +40,15 @@ class Stat extends Table
      * @param ByteBuffer $_bb
      * @return Stat
      **/
-    public function Init($_i, ByteBuffer $_bb) {
+    public function init($_i, ByteBuffer $_bb)
+    {
         $this->bb_pos = $_i;
         $this->bb = $_bb;
-        return $this;        
+        return $this;
     }
 
-    public function GetId(){
+    public function getId()
+    {
         $o = $this->__offset(4);
         return $o != 0 ? $this->__string($o + $this->bb_pos) : null;
     }
@@ -54,7 +56,7 @@ class Stat extends Table
     /**
      * @return long
      */
-    public function GetVal()
+    public function getVal()
     {
         $o = $this->__offset(6);
         return $o != 0 ? $this->bb->GetLong($o + $this->bb_pos) : 0;
@@ -63,7 +65,7 @@ class Stat extends Table
     /**
      * @return ushort
      */
-    public function GetCount()
+    public function getCount()
     {
         $o = $this->__offset(8);
         return $o != 0 ? $this->bb->GetUshort($o + $this->bb_pos) : 0;
@@ -73,7 +75,8 @@ class Stat extends Table
      * @param FlatBufferBuilder $builder
      * @return void
      */
-    public static function StartStat(FlatBufferBuilder $builder){ 
+    public static function startStat(FlatBufferBuilder $builder)
+    {
         $builder->StartObject(3);
     }
 
@@ -81,13 +84,13 @@ class Stat extends Table
      * @param FlatBufferBuilder $builder
      * @return Stat
      */
-    public static function CreateStat(FlatBufferBuilder $builder, $id, $val, $count)
+    public static function createStat(FlatBufferBuilder $builder, $id, $val, $count)
     {
-        $builder->StartObject(3);
-        self::AddId($builder, $id);
-        self::AddVal($builder, $val);
-        self::AddCount($builder, $count);
-        $o = $builder->EndObject();
+        $builder->startObject(3);
+        self::addId($builder, $id);
+        self::addVal($builder, $val);
+        self::addCount($builder, $count);
+        $o = $builder->endObject();
         return $o;
     }
 
@@ -96,8 +99,9 @@ class Stat extends Table
      * @param StringOffset
      * @return void
      */
-    public static function AddId(FlatBufferBuilder $builder, $id){
-         $builder->AddOffsetX(0, $id, 0);
+    public static function AddId(FlatBufferBuilder $builder, $id)
+    {
+        $builder->addOffsetX(0, $id, 0);
     }
 
     /**
@@ -105,8 +109,9 @@ class Stat extends Table
      * @param long
      * @return void
      */
-    public static function AddVal(FlatBufferBuilder $builder, $val){
-         $builder->AddLongX(1, $val, 0);
+    public static function AddVal(FlatBufferBuilder $builder, $val)
+    {
+        $builder->addLongX(1, $val, 0);
     }
 
     /**
@@ -114,18 +119,18 @@ class Stat extends Table
      * @param ushort
      * @return void
      */
-    public static function AddCount(FlatBufferBuilder $builder, $count){
-         $builder->AddUshortX(2, $count, 0);
+    public static function AddCount(FlatBufferBuilder $builder, $count)
+    {
+        $builder->addUshortX(2, $count, 0);
     }
 
     /**
      * @param FlatBufferBuilder $builder
      * @return int table offset
      */
-    public static function EndStat(FlatBufferBuilder $builder){
-        $o = $builder->EndObject();
+    public static function endStat(FlatBufferBuilder $builder)
+    {
+        $o = $builder->endObject();
         return $o;
     }
-
 }
-

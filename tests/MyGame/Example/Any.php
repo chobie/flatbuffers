@@ -15,12 +15,11 @@ class Any
         "TestSimpleTableWithEnum",
     );
 
-    public static function Name($e) {
+    public static function Name($e)
+    {
         if (!isset(self::$names[$e])) {
             throw new \Exception();
         }
         return self::$names[$e];
     }
-
 }
-

@@ -40,8 +40,8 @@ abstract class Table
      */
     protected function __offset($vtable_offset)
     {
-        $vtable = $this->bb_pos - $this->bb->GetInt($this->bb_pos);
-        return $vtable_offset < $this->bb->GetShort($vtable) ? $this->bb->GetShort($vtable + $vtable_offset) : 0;
+        $vtable = $this->bb_pos - $this->bb->getInt($this->bb_pos);
+        return $vtable_offset < $this->bb->getShort($vtable) ? $this->bb->getShort($vtable + $vtable_offset) : 0;
     }
 
     /**
@@ -50,7 +50,7 @@ abstract class Table
      */
     protected function __indirect($offset)
     {
-        return $offset + $this->bb->GetInt($offset);
+        return $offset + $this->bb->getInt($offset);
     }
 
     /**
@@ -61,8 +61,8 @@ abstract class Table
      */
     protected function __string($offset)
     {
-        $offset += $this->bb->GetInt($offset);
-        $len = $this->bb->GetInt($offset);
+        $offset += $this->bb->getInt($offset);
+        $len = $this->bb->getInt($offset);
         $startPos = $offset + Constants::SIZEOF_INT;
         return substr($this->bb->_buffer, $startPos, $len);
     }
@@ -74,8 +74,8 @@ abstract class Table
     protected function __vector_len($offset)
     {
         $offset += $this->bb_pos;
-        $offset += $this->bb->GetInt($offset);
-        return $this->bb->GetInt($offset);
+        $offset += $this->bb->getInt($offset);
+        return $this->bb->getInt($offset);
     }
 
     /**
@@ -86,7 +86,7 @@ abstract class Table
     {
         $offset += $this->bb_pos;
         // data starts after the length
-        return $offset + $this->bb->GetInt($offset) + Constants::SIZEOF_INT;
+        return $offset + $this->bb->getInt($offset) + Constants::SIZEOF_INT;
     }
 
 //    protected function __vector_as_bytebuffer($vector_offset, $elem_size)
@@ -101,7 +101,7 @@ abstract class Table
     protected function __union($table, $offset)
     {
         $offset += $this->bb_pos;
-        $table->bb_pos = $offset + $this->bb->GetInt($offset);
+        $table->bb_pos = $offset + $this->bb->getInt($offset);
         $table->bb = $this->bb;
         return $table;
     }
@@ -114,12 +114,12 @@ abstract class Table
      */
     protected static function __has_identifier($bb, $ident)
     {
-        if (strlen($ident) != Constants::FILE_IDENTIFIER_LENGTH)
+        if (strlen($ident) != Constants::FILE_IDENTIFIER_LENGTH) {
             throw new \ArgumentException("FlatBuffers: file identifier must be length "  . Constants::FILE_IDENTIFIER_LENGTH);
+        }
 
-        for ($i = 0; $i < 4; $i++)
-        {
-            if ($ident[$i] != $bb->Get($bb->GetPosition() + Constants::SIZEOF_INT + $i)) {
+        for ($i = 0; $i < 4; $i++) {
+            if ($ident[$i] != $bb->get($bb->getPosition() + Constants::SIZEOF_INT + $i)) {
                 return false;
             }
         }

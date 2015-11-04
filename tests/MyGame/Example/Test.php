@@ -15,10 +15,11 @@ class Test extends Struct
      * @param ByteBuffer $_bb
      * @return Test
      **/
-    public function Init($_i, ByteBuffer $_bb) {
+    public function init($_i, ByteBuffer $_bb)
+    {
         $this->bb_pos = $_i;
         $this->bb = $_bb;
-        return $this;        
+        return $this;
     }
 
     /**
@@ -26,7 +27,7 @@ class Test extends Struct
      */
     public function GetA()
     {
-        return $this->bb->GetShort($this->bb_pos + 0);
+        return $this->bb->getShort($this->bb_pos + 0);
     }
 
     /**
@@ -34,20 +35,19 @@ class Test extends Struct
      */
     public function GetB()
     {
-        return $this->bb->GetSbyte($this->bb_pos + 2);
+        return $this->bb->getSbyte($this->bb_pos + 2);
     }
 
 
     /**
      * @return int offset
      */
-    public static function CreateTest(FlatBufferBuilder $builder, $a, $b){
+    public static function createTest(FlatBufferBuilder $builder, $a, $b)
+    {
         $builder->prep(2, 4);
         $builder->pad(1);
-        $builder->PutSbyte($b);
-        $builder->PutShort($a);
+        $builder->putSbyte($b);
+        $builder->putShort($a);
         return $builder->offset();
     }
-
 }
-

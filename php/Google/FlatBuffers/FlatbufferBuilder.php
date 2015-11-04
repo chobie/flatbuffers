@@ -17,9 +17,8 @@
 
 namespace Google\FlatBuffers;
 
-class FlatBufferBuilder
+class FlatbufferBuilder
 {
-
     /**
      * @var ByteBuffer $bb
      */
@@ -82,7 +81,9 @@ class FlatBufferBuilder
      */
     public function __construct($initial_size)
     {
-        if ($initial_size <= 0) $initial_size = 1;
+        if ($initial_size <= 0) {
+            $initial_size = 1;
+        }
         $this->space = $initial_size;
         $this->bb = $this->newByteBuffer($initial_size);
     }
@@ -105,7 +106,7 @@ class FlatBufferBuilder
      */
     public function offset()
     {
-        return $this->bb->Capacity() - $this->space;
+        return $this->bb->capacity() - $this->space;
     }
 
     /**
@@ -116,7 +117,7 @@ class FlatBufferBuilder
     public function pad($byte_size)
     {
         for ($i = 0; $i < $byte_size; $i++) {
-            $this->bb->PutByte(--$this->space, "\0");
+            $this->bb->putByte(--$this->space, "\0");
         }
     }
 
@@ -133,11 +134,11 @@ class FlatBufferBuilder
             $this->minalign = $size;
         }
 
-        $align_size = ((~($this->bb->Capacity() - $this->space + $additional_bytes)) + 1) & ($size - 1);
+        $align_size = ((~($this->bb->capacity() - $this->space + $additional_bytes)) + 1) & ($size - 1);
         while ($this->space < $align_size + $size  + $additional_bytes) {
-            $old_buf_size = $this->bb->Capacity();
+            $old_buf_size = $this->bb->capacity();
             $this->bb = $this->growByteBuffer($this->bb);
-            $this->space += $this->bb->Capacity() - $old_buf_size;
+            $this->space += $this->bb->capacity() - $old_buf_size;
         }
 
         $this->pad($align_size);
@@ -150,16 +151,16 @@ class FlatBufferBuilder
      */
     private static function growByteBuffer(ByteBuffer $bb)
     {
-        $old_buf_size = $bb->Capacity();
+        $old_buf_size = $bb->capacity();
         if (($old_buf_size & 0xC0000000) != 0) {
             throw new \Exception("FlatBuffers: cannot grow buffer beyond 2 gigabytes");
         }
         $new_buf_size = $old_buf_size << 1;
 
-        $bb->SetPosition(0);
+        $bb->setPosition(0);
         $nbb = new ByteBuffer($new_buf_size);
 
-        $nbb->SetPosition($new_buf_size - $old_buf_size);
+        $nbb->setPosition($new_buf_size - $old_buf_size);
         //$nbb->_buffer = substr_replace($nbb->_buffer, $bb->_buffer, $new_buf_size - $old_buf_size, strlen($bb->_buffer));
         for ($i = $new_buf_size - $old_buf_size, $j = 0; $j < strlen($bb->_buffer); $i++, $j++) {
             $nbb->_buffer[$i] = $bb->_buffer[$j];
@@ -173,7 +174,7 @@ class FlatBufferBuilder
      */
     public function putBool($x)
     {
-        $this->bb->PutX($this->space -= 1, chr((int)(bool)($x)));
+        $this->bb->putX($this->space -= 1, chr((int)(bool)($x)));
     }
 
     /**
@@ -181,7 +182,7 @@ class FlatBufferBuilder
      */
     public function putByte($x)
     {
-        $this->bb->PutX($this->space -= 1, chr($x));
+        $this->bb->putX($this->space -= 1, chr($x));
     }
 
     /**
@@ -189,7 +190,7 @@ class FlatBufferBuilder
      */
     public function putSbyte($x)
     {
-        $this->bb->PutX($this->space -= 1, chr($x));
+        $this->bb->putX($this->space -= 1, chr($x));
     }
 
     /**
@@ -197,7 +198,7 @@ class FlatBufferBuilder
      */
     public function putShort($x)
     {
-        $this->bb->PutShortX($this->space -= 2, $x);
+        $this->bb->putShortX($this->space -= 2, $x);
     }
 
     /**
@@ -205,7 +206,7 @@ class FlatBufferBuilder
      */
     public function putUshort($x)
     {
-        $this->bb->PutUshortX($this->space -= 2, $x);
+        $this->bb->putUshortX($this->space -= 2, $x);
     }
 
     /**
@@ -213,7 +214,7 @@ class FlatBufferBuilder
      */
     public function putInt($x)
     {
-        $this->bb->PutIntX($this->space -= 4, $x);
+        $this->bb->putIntX($this->space -= 4, $x);
     }
 
     /**
@@ -225,7 +226,7 @@ class FlatBufferBuilder
             throw new \OverflowException("your platform can't handling uint correctly. use 64bit machine.");
         }
 
-        $this->bb->PutUintX($this->space -= 4, $x);
+        $this->bb->putUintX($this->space -= 4, $x);
     }
 
     /**
@@ -237,7 +238,7 @@ class FlatBufferBuilder
             throw new \OverflowException("your platform can't handling long correctly. use 64bit machine.");
         }
 
-        $this->bb->PutLongX($this->space -= 8, $x);
+        $this->bb->putLongX($this->space -= 8, $x);
     }
 
     /**
@@ -249,7 +250,7 @@ class FlatBufferBuilder
             throw new \OverflowException("your platform can't handling ulong correctly. this is php limitations. please wait extension release.");
         }
 
-        $this->bb->PutUlongX($this->space -= 8, $x);
+        $this->bb->putUlongX($this->space -= 8, $x);
     }
 
     /**
@@ -257,20 +258,22 @@ class FlatBufferBuilder
      */
     public function putFloat($x)
     {
-        $this->bb->PutFloatX($this->space -= 4, $x);
+        $this->bb->putFloatX($this->space -= 4, $x);
     }
 
     /**
      * @param $x
      */
-    public function putDouble($x){
-        $this->bb->PutDoubleX($this->space -= 8, $x);
+    public function putDouble($x)
+    {
+        $this->bb->putDoubleX($this->space -= 8, $x);
     }
 
     /**
      * @param $x
      */
-    public function addBool($x){
+    public function addBool($x)
+    {
         $this->prep(1, 0);
         $this->putBool($x);
     }
@@ -278,7 +281,8 @@ class FlatBufferBuilder
     /**
      * @param $x
      */
-    public function addByte($x){
+    public function addByte($x)
+    {
         $this->prep(1, 0);
         $this->putByte($x);
     }
@@ -286,7 +290,8 @@ class FlatBufferBuilder
     /**
      * @param $x
      */
-    public function addSbyte($x){
+    public function addSbyte($x)
+    {
         $this->prep(1, 0);
         $this->putSbyte($x);
     }
@@ -294,7 +299,8 @@ class FlatBufferBuilder
     /**
      * @param $x
      */
-    public function addShort($x){
+    public function addShort($x)
+    {
         $this->prep(2, 0);
         $this->putShort($x);
     }
@@ -302,7 +308,8 @@ class FlatBufferBuilder
     /**
      * @param $x
      */
-    public function addUshort($x){
+    public function addUshort($x)
+    {
         $this->prep(2, 0);
         $this->putUshort($x);
     }
@@ -310,7 +317,8 @@ class FlatBufferBuilder
     /**
      * @param $x
      */
-    public function addInt($x){
+    public function addInt($x)
+    {
         $this->prep(4, 0);
         $this->putInt($x);
     }
@@ -318,7 +326,8 @@ class FlatBufferBuilder
     /**
      * @param $x
      */
-    public function addUint($x){
+    public function addUint($x)
+    {
         $this->prep(4, 0);
         $this->putUint($x);
     }
@@ -327,7 +336,8 @@ class FlatBufferBuilder
     /**
      * @param $x
      */
-    public function addLong($x){
+    public function addLong($x)
+    {
         $this->prep(8, 0);
         $this->putLong($x);
     }
@@ -335,7 +345,8 @@ class FlatBufferBuilder
     /**
      * @param $x
      */
-    public function addUlong($x){
+    public function addUlong($x)
+    {
         $this->prep(8, 0);
         $this->putUlong($x);
     }
@@ -343,7 +354,8 @@ class FlatBufferBuilder
     /**
      * @param $x
      */
-    public function addFloat($x){
+    public function addFloat($x)
+    {
         $this->prep(4, 0);
         $this->putFloat($x);
     }
@@ -351,7 +363,8 @@ class FlatBufferBuilder
     /**
      * @param $x
      */
-    public function addDouble($x){
+    public function addDouble($x)
+    {
         $this->prep(8, 0);
         $this->putDouble($x);
     }
@@ -596,7 +609,6 @@ class FlatBufferBuilder
                     $bytes[$j] = "\xEF") &&
                 ($bytes[$j+1] >= "\x80" && $bytes[$j+1] <= "\xBF") &&
                 ($bytes[$j+2] >= "\x80" && $bytes[$j+2] <= "\xBF")) {
-
                 $j += 3;
                 $i += 2;
                 continue;
@@ -618,7 +630,6 @@ class FlatBufferBuilder
                 ($bytes[$j+1] >= "\x90" && $bytes[$j+1] <= "\xBF") &&
                 ($bytes[$j+2] >= "\x80" && $bytes[$j+2] <= "\xBF") &&
                 ($bytes[$j+3] >= "\x80" && $bytes[$j+3] <= "\xBF")) {
-
                 $j += 4;
                 $i+3;
                 continue;
@@ -662,7 +673,7 @@ class FlatBufferBuilder
      * @return int
      * @throws \Exception
      */
-    public function CreateString($s)
+    public function createString($s)
     {
         if (!$this->is_utf8($s)) {
             throw new \InvalidArgumentException("string must be utf-8 encoded value.");
@@ -692,7 +703,7 @@ class FlatBufferBuilder
      * @param $obj
      * @throws \Exception
      */
-    public function Nested($obj)
+    public function nested($obj)
     {
         if ($obj != $this->offset()) {
             throw new \Exception("FlatBuffers: struct must be serialized inline");
@@ -728,7 +739,7 @@ class FlatBufferBuilder
     public function addStructX($voffset, $x, $d)
     {
         if ($x != $d) {
-            $this->Nested($x);
+            $this->nested($x);
             $this->slot($voffset);
         }
     }
@@ -742,7 +753,7 @@ class FlatBufferBuilder
     public function addStruct($voffset, $x, $d)
     {
         if ($x != $d) {
-            $this->Nested($x);
+            $this->nested($x);
             $this->slot($voffset);
         }
     }
@@ -781,14 +792,14 @@ class FlatBufferBuilder
         $existing_vtable = 0;
 
         for ($i = 0; $i < $this->num_vtables; $i++) {
-            $vt1 = $this->bb->Capacity() - $this->vtables[$i];
+            $vt1 = $this->bb->capacity() - $this->vtables[$i];
             $vt2 = $this->space;
 
-            $len = $this->bb->GetShort($vt1);
+            $len = $this->bb->getShort($vt1);
 
-            if ($len == $this->bb->GetShort($vt2)) {
+            if ($len == $this->bb->getShort($vt2)) {
                 for ($j = Constants::SIZEOF_SHORT; $j < $len; $j += Constants::SIZEOF_SHORT) {
-                    if ($this->bb->GetShort($vt1 + $j) != $this->bb->GetShort($vt2 + $j)) {
+                    if ($this->bb->getShort($vt1 + $j) != $this->bb->getShort($vt2 + $j)) {
                         continue 2;
                     }
                 }
@@ -800,8 +811,8 @@ class FlatBufferBuilder
         if ($existing_vtable != 0) {
             // Found a match:
             // Remove the current vtable
-            $this->space = $this->bb->Capacity() - $vtableloc;
-            $this->bb->PutIntX($this->space, $existing_vtable - $vtableloc);
+            $this->space = $this->bb->capacity() - $vtableloc;
+            $this->bb->putIntX($this->space, $existing_vtable - $vtableloc);
         } else {
             // No Match:
             // Add the location of the current vtable to the list of vtables
@@ -814,7 +825,7 @@ class FlatBufferBuilder
                 }
             }
             $this->vtables[$this->num_vtables++] = $this->offset();
-            $this->bb->PutIntX($this->bb->Capacity() - $vtableloc, $this->offset() - $vtableloc);
+            $this->bb->putIntX($this->bb->capacity() - $vtableloc, $this->offset() - $vtableloc);
         }
 
         $this->nested = false;
@@ -829,9 +840,9 @@ class FlatBufferBuilder
      */
     public function required($table, $field)
     {
-        $table_start = $this->bb->Capacity() - $table;
-        $vtable_start = $table_start - $this->bb->GetInt($table_start);
-        $ok = $this->bb->GetShort($vtable_start + $field) != 0;
+        $table_start = $this->bb->capacity() - $table;
+        $vtable_start = $table_start - $this->bb->getInt($table_start);
+        $ok = $this->bb->getShort($vtable_start + $field) != 0;
 
         if (!$ok) {
             throw new \Exception("FlatBuffers: field "  . $field  .  " must be set");
@@ -847,7 +858,7 @@ class FlatBufferBuilder
         if ($identifier == null) {
             $this->prep($this->minalign, Constants::SIZEOF_INT);
             $this->addOffset($root_table);
-            $this->bb->SetPosition($this->space);
+            $this->bb->setPosition($this->space);
         } else {
             $this->prep($this->minalign, Constants::SIZEOF_INT + Constants::FILE_IDENTIFIER_LENGTH);
             if (strlen($identifier) != Constants::FILE_IDENTIFIER_LENGTH) {
@@ -856,12 +867,11 @@ class FlatBufferBuilder
                         Constants::FILE_IDENTIFIER_LENGTH));
             }
 
-             for ($i = Constants::FILE_IDENTIFIER_LENGTH - 1; $i >= 0;
-                  $i--)
-             {
-                 $this->AddByte(ord($identifier[$i]));
-             }
-             $this->finish($root_table);
+            for ($i = Constants::FILE_IDENTIFIER_LENGTH - 1; $i >= 0;
+                  $i--) {
+                $this->AddByte(ord($identifier[$i]));
+            }
+            $this->finish($root_table);
         }
     }
 
@@ -895,11 +905,11 @@ class FlatBufferBuilder
     public function sizedByteArray()
     {
         $start = $this->space;
-        $length = $this->bb->Capacity() - $this->space;
+        $length = $this->bb->capacity() - $this->space;
 
         $result = str_repeat("\0", $length);
-        $this->bb->SetPosition($start);
-        $this->bb->GetX($result);
+        $this->bb->setPosition($start);
+        $this->bb->getX($result);
 
         return $result;
     }
