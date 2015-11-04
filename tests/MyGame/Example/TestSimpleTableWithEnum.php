@@ -3,10 +3,10 @@
 
 namespace MyGame\Example;
 
-use \FlatBuffers\Struct;
-use \FlatBuffers\Table;
-use \FlatBuffers\ByteBuffer;
-use \FlatBuffers\FlatBufferBuilder;
+use \Google\FlatBuffers\Struct;
+use \Google\FlatBuffers\Table;
+use \Google\FlatBuffers\ByteBuffer;
+use \Google\FlatBuffers\FlatBufferBuilder;
 
 class TestSimpleTableWithEnum extends Table
 {
@@ -17,7 +17,7 @@ class TestSimpleTableWithEnum extends Table
     public static function GetRootAsTestSimpleTableWithEnum(ByteBuffer $bb)
     {
         $obj = new TestSimpleTableWithEnum();
-        return ($obj->Init($bb->GetInt($bb->GetPosition()) + $bb->GetPosition(), $bb));
+        return ($obj->Init($bb->GetInt($bb->GetPosition()) +$bb->GetPosition(), $bb)); 
     }
 
     public static function TestSimpleTableWithEnumIdentifier()

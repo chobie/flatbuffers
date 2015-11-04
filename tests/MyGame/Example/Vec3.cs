@@ -14,9 +14,7 @@ public sealed class Vec3 : Struct {
   public void MutateY(float y) { bb.PutFloat(bb_pos + 4, y); }
   public float Z { get { return bb.GetFloat(bb_pos + 8); } }
   public void MutateZ(float z) { bb.PutFloat(bb_pos + 8, z); }
-  public double Test1 { get {
-     return bb.GetDouble(bb_pos + 16);
-   } }
+  public double Test1 { get { return bb.GetDouble(bb_pos + 16); } }
   public void MutateTest1(double test1) { bb.PutDouble(bb_pos + 16, test1); }
   public Color Test2 { get { return (Color)bb.GetSbyte(bb_pos + 24); } }
   public void MutateTest2(Color test2) { bb.PutSbyte(bb_pos + 24, (sbyte)test2); }

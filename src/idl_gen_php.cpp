@@ -51,7 +51,7 @@ namespace php {
 
 
     // Hardcode spaces per indentation.
-    const std::string Indent = "  ";
+    const std::string Indent = "    ";
 
     // Begin by declaring namespace and imports.
     static void BeginFile(const std::string name_space_name,
@@ -63,10 +63,10 @@ namespace php {
       code += "namespace " + name_space_name + ";\n\n";
 
       if (needs_imports) {
-        code += "use \\FlatBuffers\\Struct;\n";
-        code += "use \\FlatBuffers\\Table;\n";
-        code += "use \\FlatBuffers\\ByteBuffer;\n";
-        code += "use \\FlatBuffers\\FlatBufferBuilder;\n";
+        code += "use \\Google\\FlatBuffers\\Struct;\n";
+        code += "use \\Google\\FlatBuffers\\Table;\n";
+        code += "use \\Google\\FlatBuffers\\ByteBuffer;\n";
+        code += "use \\Google\\FlatBuffers\\FlatBufferBuilder;\n";
         code += "\n";
       }
     }

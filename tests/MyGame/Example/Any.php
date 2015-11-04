@@ -17,7 +17,7 @@ class Any
 
     public static function Name($e) {
         if (!isset(self::$names[$e])) {
-            throw new \Exception('not found');
+            throw new \Exception();
         }
         return self::$names[$e];
     }

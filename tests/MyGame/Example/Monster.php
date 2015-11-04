@@ -3,10 +3,10 @@
 
 namespace MyGame\Example;
 
-use \FlatBuffers\Struct;
-use \FlatBuffers\Table;
-use \FlatBuffers\ByteBuffer;
-use \FlatBuffers\FlatBufferBuilder;
+use \Google\FlatBuffers\Struct;
+use \Google\FlatBuffers\Table;
+use \Google\FlatBuffers\ByteBuffer;
+use \Google\FlatBuffers\FlatBufferBuilder;
 
 /// an example documentation comment: monster object
 class Monster extends Table
@@ -18,7 +18,7 @@ class Monster extends Table
     public static function GetRootAsMonster(ByteBuffer $bb)
     {
         $obj = new Monster();
-        return ($obj->Init($bb->GetInt($bb->GetPosition()) + $bb->GetPosition(), $bb));
+        return ($obj->Init($bb->GetInt($bb->GetPosition()) +$bb->GetPosition(), $bb)); 
     }
 
     public static function MonsterIdentifier()
@@ -127,7 +127,6 @@ class Monster extends Table
     public function GetTest4($j) {
         $o = $this->__offset(22);
         $obj = new Test();
-// base_type_vector
         return $o != 0 ? $obj->Init($this->__vector($o) + $j *4, $this->bb) : null;
     }
 
@@ -166,7 +165,6 @@ class Monster extends Table
     public function GetTestarrayoftables($j) {
         $o = $this->__offset(26);
         $obj = new Monster();
-// base_type_vector
         return $o != 0 ? $obj->Init($this->__indirect($this->__vector($o) + $j * 4), $this->bb) : null;
     }
 

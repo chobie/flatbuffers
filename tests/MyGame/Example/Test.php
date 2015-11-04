@@ -3,10 +3,10 @@
 
 namespace MyGame\Example;
 
-use \FlatBuffers\Struct;
-use \FlatBuffers\Table;
-use \FlatBuffers\ByteBuffer;
-use \FlatBuffers\FlatBufferBuilder;
+use \Google\FlatBuffers\Struct;
+use \Google\FlatBuffers\Table;
+use \Google\FlatBuffers\ByteBuffer;
+use \Google\FlatBuffers\FlatBufferBuilder;
 
 class Test extends Struct
 {
