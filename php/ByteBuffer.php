@@ -34,11 +34,6 @@ class ByteBuffer
      */
     private static $_is_little_endian = null;
 
-    private $floathelper = "";
-    private $inthelper = "";
-    private $doublehelper = "";
-    private $ulonghelper = "";
-
     public static function wrap($bytes)
     {
         $bb = new ByteBuffer(0);
@@ -53,11 +48,6 @@ class ByteBuffer
     public function __construct($size)
     {
         $this->_buffer = str_repeat("\0", $size);
-
-        $this->floathelper = pack("f", 0);
-        $this->inthelper = pack("V", 0);
-        $this->doublehelper = pack("d", 0);
-        $this->ulonghelper = "\0\0\0\0\0\0\0\0";
     }
 
     /**
@@ -206,7 +196,7 @@ class ByteBuffer
      * @param $offset
      * @param $value
      */
-    public function putX($offset, $value)
+    public function put($offset, $value)
     {
         $length = strlen($value);
         $this->assertOffsetAndLength($offset, $length);
@@ -219,17 +209,7 @@ class ByteBuffer
      * @param $offset
      * @param $value
      */
-    public function putShortX($offset, $value)
-    {
-        $this->assertOffsetAndLength($offset, 2);
-        $this->writeLittleEndian($offset, 2, $value);
-    }
-
-    /**
-     * @param $offset
-     * @param $value
-     */
-    public function putUshortX($offset, $value)
+    public function putShort($offset, $value)
     {
         $this->assertOffsetAndLength($offset, 2);
         $this->writeLittleEndian($offset, 2, $value);
@@ -249,17 +229,7 @@ class ByteBuffer
      * @param $offset
      * @param $value
      */
-    public function putIntX($offset, $value)
-    {
-        $this->assertOffsetAndLength($offset, 4);
-        $this->writeLittleEndian($offset, 4, $value);
-    }
-
-    /**
-     * @param $offset
-     * @param $value
-     */
-    public function putUintX($offset, $value)
+    public function putInt($offset, $value)
     {
         $this->assertOffsetAndLength($offset, 4);
         $this->writeLittleEndian($offset, 4, $value);
@@ -279,7 +249,7 @@ class ByteBuffer
      * @param $offset
      * @param $value
      */
-    public function putLongX($offset, $value)
+    public function putLong($offset, $value)
     {
         $this->assertOffsetAndLength($offset, 8);
         $this->writeLittleEndian($offset, 8, $value);
@@ -289,7 +259,7 @@ class ByteBuffer
      * @param $offset
      * @param $value
      */
-    public function putUlongX($offset, $value)
+    public function putUlong($offset, $value)
     {
         $this->assertOffsetAndLength($offset, 8);
         $this->writeLittleEndian($offset, 8, $value);
@@ -299,7 +269,7 @@ class ByteBuffer
      * @param $offset
      * @param $value
      */
-    public function putFloatX($offset, $value)
+    public function putFloat($offset, $value)
     {
         $this->assertOffsetAndLength($offset, 4);
 
@@ -312,7 +282,7 @@ class ByteBuffer
      * @param $offset
      * @param $value
      */
-    public function putDoubleX($offset, $value)
+    public function putDouble($offset, $value)
     {
         $this->assertOffsetAndLength($offset, 8);
 

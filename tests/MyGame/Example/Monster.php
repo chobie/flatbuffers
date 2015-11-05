@@ -61,7 +61,7 @@ class Monster extends Table
     public function getMana()
     {
         $o = $this->__offset(6);
-        return $o != 0 ? $this->bb->GetShort($o + $this->bb_pos) : 150;
+        return $o != 0 ? $this->bb->getShort($o + $this->bb_pos) : 150;
     }
 
     /**
@@ -70,7 +70,7 @@ class Monster extends Table
     public function getHp()
     {
         $o = $this->__offset(8);
-        return $o != 0 ? $this->bb->GetShort($o + $this->bb_pos) : 100;
+        return $o != 0 ? $this->bb->getShort($o + $this->bb_pos) : 100;
     }
 
     public function getName()
@@ -86,7 +86,7 @@ class Monster extends Table
     public function getInventory($j)
     {
         $o = $this->__offset(14);
-        return $o != 0 ? $this->bb->GetByte($this->__vector($o) + $j * 1) : 0;
+        return $o != 0 ? $this->bb->getByte($this->__vector($o) + $j * 1) : 0;
     }
 
     /**
@@ -104,7 +104,7 @@ class Monster extends Table
     public function getColor()
     {
         $o = $this->__offset(16);
-        return $o != 0 ? $this->bb->GetSbyte($o + $this->bb_pos) : \MyGame\Example\Color::Blue;
+        return $o != 0 ? $this->bb->getSbyte($o + $this->bb_pos) : \MyGame\Example\Color::Blue;
     }
 
     /**
@@ -113,7 +113,7 @@ class Monster extends Table
     public function getTestType()
     {
         $o = $this->__offset(18);
-        return $o != 0 ? $this->bb->GetByte($o + $this->bb_pos) : \MyGame\Example\Any::NONE;
+        return $o != 0 ? $this->bb->getByte($o + $this->bb_pos) : \MyGame\Example\Any::NONE;
     }
 
     /**
@@ -198,7 +198,7 @@ class Monster extends Table
     public function getTestnestedflatbuffer($j)
     {
         $o = $this->__offset(30);
-        return $o != 0 ? $this->bb->GetByte($this->__vector($o) + $j * 1) : 0;
+        return $o != 0 ? $this->bb->getByte($this->__vector($o) + $j * 1) : 0;
     }
 
     /**
@@ -223,7 +223,7 @@ class Monster extends Table
     public function getTestbool()
     {
         $o = $this->__offset(34);
-        return $o != 0 ? $this->bb->GetBool($o + $this->bb_pos) : false;
+        return $o != 0 ? $this->bb->getBool($o + $this->bb_pos) : false;
     }
 
     /**
@@ -232,7 +232,7 @@ class Monster extends Table
     public function getTesthashs32Fnv1()
     {
         $o = $this->__offset(36);
-        return $o != 0 ? $this->bb->GetInt($o + $this->bb_pos) : 0;
+        return $o != 0 ? $this->bb->getInt($o + $this->bb_pos) : 0;
     }
 
     /**
@@ -241,7 +241,7 @@ class Monster extends Table
     public function getTesthashu32Fnv1()
     {
         $o = $this->__offset(38);
-        return $o != 0 ? $this->bb->GetUint($o + $this->bb_pos) : 0;
+        return $o != 0 ? $this->bb->getUint($o + $this->bb_pos) : 0;
     }
 
     /**
@@ -250,7 +250,7 @@ class Monster extends Table
     public function getTesthashs64Fnv1()
     {
         $o = $this->__offset(40);
-        return $o != 0 ? $this->bb->GetLong($o + $this->bb_pos) : 0;
+        return $o != 0 ? $this->bb->getLong($o + $this->bb_pos) : 0;
     }
 
     /**
@@ -259,7 +259,7 @@ class Monster extends Table
     public function getTesthashu64Fnv1()
     {
         $o = $this->__offset(42);
-        return $o != 0 ? $this->bb->GetUlong($o + $this->bb_pos) : 0;
+        return $o != 0 ? $this->bb->getUlong($o + $this->bb_pos) : 0;
     }
 
     /**
@@ -268,7 +268,7 @@ class Monster extends Table
     public function getTesthashs32Fnv1a()
     {
         $o = $this->__offset(44);
-        return $o != 0 ? $this->bb->GetInt($o + $this->bb_pos) : 0;
+        return $o != 0 ? $this->bb->getInt($o + $this->bb_pos) : 0;
     }
 
     /**
@@ -277,7 +277,7 @@ class Monster extends Table
     public function getTesthashu32Fnv1a()
     {
         $o = $this->__offset(46);
-        return $o != 0 ? $this->bb->GetUint($o + $this->bb_pos) : 0;
+        return $o != 0 ? $this->bb->getUint($o + $this->bb_pos) : 0;
     }
 
     /**
@@ -286,7 +286,7 @@ class Monster extends Table
     public function getTesthashs64Fnv1a()
     {
         $o = $this->__offset(48);
-        return $o != 0 ? $this->bb->GetLong($o + $this->bb_pos) : 0;
+        return $o != 0 ? $this->bb->getLong($o + $this->bb_pos) : 0;
     }
 
     /**
@@ -295,7 +295,7 @@ class Monster extends Table
     public function getTesthashu64Fnv1a()
     {
         $o = $this->__offset(50);
-        return $o != 0 ? $this->bb->GetUlong($o + $this->bb_pos) : 0;
+        return $o != 0 ? $this->bb->getUlong($o + $this->bb_pos) : 0;
     }
 
     /**
@@ -305,7 +305,7 @@ class Monster extends Table
     public function getTestarrayofbools($j)
     {
         $o = $this->__offset(52);
-        return $o != 0 ? $this->bb->GetBool($this->__vector($o) + $j * 1) : 0;
+        return $o != 0 ? $this->bb->getBool($this->__vector($o) + $j * 1) : 0;
     }
 
     /**

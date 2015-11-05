@@ -53,7 +53,7 @@ class TestSimpleTableWithEnum extends Table
     public function getColor()
     {
         $o = $this->__offset(4);
-        return $o != 0 ? $this->bb->GetSbyte($o + $this->bb_pos) : \MyGame\Example\Color::Green;
+        return $o != 0 ? $this->bb->getSbyte($o + $this->bb_pos) : \MyGame\Example\Color::Green;
     }
 
     /**

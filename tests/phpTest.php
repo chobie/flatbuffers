@@ -1,10 +1,10 @@
 <?php
 // manual load for testing. please use PSR style autoloader when you use flatbuffers.
-require join(DIRECTORY_SEPARATOR, array(dirname(dirname(__FILE__)), "php", "Google", "FlatBuffers", "Constants.php"));
-require join(DIRECTORY_SEPARATOR, array(dirname(dirname(__FILE__)), "php", "Google", "FlatBuffers", "ByteBuffer.php"));
-require join(DIRECTORY_SEPARATOR, array(dirname(dirname(__FILE__)), "php", "Google", "FlatBuffers", "FlatbufferBuilder.php"));
-require join(DIRECTORY_SEPARATOR, array(dirname(dirname(__FILE__)), "php", "Google", "FlatBuffers", "Table.php"));
-require join(DIRECTORY_SEPARATOR, array(dirname(dirname(__FILE__)), "php", "Google", "FlatBuffers", "Struct.php"));
+require join(DIRECTORY_SEPARATOR, array(dirname(dirname(__FILE__)), "php", "Constants.php"));
+require join(DIRECTORY_SEPARATOR, array(dirname(dirname(__FILE__)), "php", "ByteBuffer.php"));
+require join(DIRECTORY_SEPARATOR, array(dirname(dirname(__FILE__)), "php", "FlatbufferBuilder.php"));
+require join(DIRECTORY_SEPARATOR, array(dirname(dirname(__FILE__)), "php", "Table.php"));
+require join(DIRECTORY_SEPARATOR, array(dirname(dirname(__FILE__)), "php", "Struct.php"));
 foreach (glob(join(DIRECTORY_SEPARATOR, array(dirname(__FILE__), "MyGame", "Example", "*.php"))) as $file) {
     require $file;
 }
@@ -343,7 +343,7 @@ function testByteBuffer(Assert $assert) {
     //Test: ByteBuffer_PutShortPopulatesBufferCorrectly
     $buffer = str_repeat("\0", 2);
     $uut = Google\FlatBuffers\ByteBuffer::wrap($buffer);
-    $uut->putShortX(0, 1);
+    $uut->putShort(0, 1);
 
     // Ensure Endiannes was written correctly
     $assert->Equal(chr(0x01), $uut->_buffer[0]);
@@ -353,27 +353,27 @@ function testByteBuffer(Assert $assert) {
     $buffer = "\0";
     $uut = Google\FlatBuffers\ByteBuffer::wrap($buffer);
     $assert->Throws(new OutOfRangeException(), function()  use ($uut) {
-        $uut->putShortX(2, "\x63"); // 99
+        $uut->putShort(2, "\x63"); // 99
     });
 
     //Test: ByteBuffer_PutShortChecksLength
     $buffer = "\0";
     $uut = Google\FlatBuffers\ByteBuffer::wrap($buffer);
     $assert->Throws(new OutOfRangeException(), function()  use ($uut) {
-        $uut->putShortX(0, "\x63"); // 99
+        $uut->putShort(0, "\x63"); // 99
     });
 
     //Test: ByteBuffer_PutShortChecksLengthAndOffset
     $buffer = str_repeat("\0", 2);
     $uut = Google\FlatBuffers\ByteBuffer::wrap($buffer);
     $assert->Throws(new OutOfRangeException(), function()  use ($uut) {
-        $uut->putShortX(1, "\x63"); // 99
+        $uut->putShort(1, "\x63"); // 99
     });
 
     //Test: ByteBuffer_PutIntPopulatesBufferCorrectly
     $buffer = str_repeat("\0", 4);
     $uut = Google\FlatBuffers\ByteBuffer::wrap($buffer);
-    $uut->putIntX(0, 0x0A0B0C0D);
+    $uut->putInt(0, 0x0A0B0C0D);
     $assert->Equal(chr(0x0D), $uut->_buffer[0]);
     $assert->Equal(chr(0x0C), $uut->_buffer[1]);
     $assert->Equal(chr(0x0B), $uut->_buffer[2]);
@@ -383,28 +383,28 @@ function testByteBuffer(Assert $assert) {
     $buffer = str_repeat("\0", 4);
     $uut = Google\FlatBuffers\ByteBuffer::wrap($buffer);
     $assert->Throws(new OutOfRangeException(), function()  use ($uut) {
-        $uut->putIntX(2, 0x0A0B0C0D);
+        $uut->putInt(2, 0x0A0B0C0D);
     });
 
     //Test: ByteBuffer_PutIntChecksLength
     $buffer = str_repeat("\0", 1);
     $uut = Google\FlatBuffers\ByteBuffer::wrap($buffer);
     $assert->Throws(new OutOfRangeException(), function()  use ($uut) {
-        $uut->putIntX(0, 0x0A0B0C0D);
+        $uut->putInt(0, 0x0A0B0C0D);
     });
 
     //Test: ByteBuffer_PutIntChecksLengthAndOffset
     $buffer = str_repeat("\0", 4);
     $uut = Google\FlatBuffers\ByteBuffer::wrap($buffer);
     $assert->Throws(new OutOfRangeException(), function()  use ($uut) {
-        $uut->putIntX(2, 0x0A0B0C0D);
+        $uut->putInt(2, 0x0A0B0C0D);
     });
 
     if (PHP_INT_SIZE > 4) {
         //Test: ByteBuffer_PutLongPopulatesBufferCorrectly
         $buffer = str_repeat("\0", 8);
         $uut = Google\FlatBuffers\ByteBuffer::wrap($buffer);
-        $uut->putLongX(0, 0x010203040A0B0C0D);
+        $uut->putLong(0, 0x010203040A0B0C0D);
         $assert->Equal(chr(0x0D), $uut->_buffer[0]);
         $assert->Equal(chr(0x0C), $uut->_buffer[1]);
         $assert->Equal(chr(0x0B), $uut->_buffer[2]);
@@ -418,14 +418,14 @@ function testByteBuffer(Assert $assert) {
         $buffer = str_repeat("\0", 8);
         $uut = Google\FlatBuffers\ByteBuffer::wrap($buffer);
         $assert->Throws(new OutOfRangeException(), function()  use ($uut) {
-            $uut->putLongX(2, 0x010203040A0B0C0D);
+            $uut->putLong(2, 0x010203040A0B0C0D);
         });
 
         //Test: ByteBuffer_PutLongCannotPutAtOffsetPastLength
         $buffer = str_repeat("\0", 1);
         $uut = Google\FlatBuffers\ByteBuffer::wrap($buffer);
         $assert->Throws(new OutOfRangeException(), function()  use ($uut) {
-            $uut->putLongX(0, 0x010203040A0B0C0D);
+            $uut->putLong(0, 0x010203040A0B0C0D);
         });
 
 
@@ -433,7 +433,7 @@ function testByteBuffer(Assert $assert) {
         $buffer = str_repeat("\0", 8);
         $uut = Google\FlatBuffers\ByteBuffer::wrap($buffer);
         $assert->Throws(new OutOfRangeException(), function()  use ($uut) {
-            $uut->putLongX(2, 0x010203040A0B0C0D);
+            $uut->putLong(2, 0x010203040A0B0C0D);
         });
     }
 

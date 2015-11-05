@@ -206,7 +206,7 @@ namespace php {
         "$o = $this->__offset(" +
         NumToString(field.value.offset) +
         ");\n" + Indent + Indent + "return $o != 0 ? ";
-      code += "$this->bb->Get";
+      code += "$this->bb->get";
       code += MakeCamel(GenTypeGet(field.value.type)) + "($o + $this->bb_pos)";
       code += " : " + GenDefaultValue(field.value) + ";\n";
       code += Indent + "}\n\n";
@@ -383,7 +383,7 @@ namespace php {
         code += NumToString(InlineSize(vectortype)) + ") : ";
         code += GenDefaultValue(field.value) + ";\n";
       } else {
-        code += Indent + Indent + "return $o != 0 ? $this->bb->Get";
+        code += Indent + Indent + "return $o != 0 ? $this->bb->get";
         code += MakeCamel(GenTypeGet(field.value.type));
         code += "($this->__vector($o) + $j * ";
         code += NumToString(InlineSize(vectortype)) + ") : ";

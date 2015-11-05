@@ -161,6 +161,8 @@ class FlatbufferBuilder
         $nbb = new ByteBuffer($new_buf_size);
 
         $nbb->setPosition($new_buf_size - $old_buf_size);
+
+        // TODO(chobie): is this little bit faster?
         //$nbb->_buffer = substr_replace($nbb->_buffer, $bb->_buffer, $new_buf_size - $old_buf_size, strlen($bb->_buffer));
         for ($i = $new_buf_size - $old_buf_size, $j = 0; $j < strlen($bb->_buffer); $i++, $j++) {
             $nbb->_buffer[$i] = $bb->_buffer[$j];
@@ -174,7 +176,7 @@ class FlatbufferBuilder
      */
     public function putBool($x)
     {
-        $this->bb->putX($this->space -= 1, chr((int)(bool)($x)));
+        $this->bb->put($this->space -= 1, chr((int)(bool)($x)));
     }
 
     /**
@@ -182,7 +184,7 @@ class FlatbufferBuilder
      */
     public function putByte($x)
     {
-        $this->bb->putX($this->space -= 1, chr($x));
+        $this->bb->put($this->space -= 1, chr($x));
     }
 
     /**
@@ -190,7 +192,7 @@ class FlatbufferBuilder
      */
     public function putSbyte($x)
     {
-        $this->bb->putX($this->space -= 1, chr($x));
+        $this->bb->put($this->space -= 1, chr($x));
     }
 
     /**
@@ -198,7 +200,7 @@ class FlatbufferBuilder
      */
     public function putShort($x)
     {
-        $this->bb->putShortX($this->space -= 2, $x);
+        $this->bb->putShort($this->space -= 2, $x);
     }
 
     /**
@@ -206,7 +208,7 @@ class FlatbufferBuilder
      */
     public function putUshort($x)
     {
-        $this->bb->putUshortX($this->space -= 2, $x);
+        $this->bb->putUshort($this->space -= 2, $x);
     }
 
     /**
@@ -214,7 +216,7 @@ class FlatbufferBuilder
      */
     public function putInt($x)
     {
-        $this->bb->putIntX($this->space -= 4, $x);
+        $this->bb->putInt($this->space -= 4, $x);
     }
 
     /**
@@ -226,7 +228,7 @@ class FlatbufferBuilder
             throw new \OverflowException("your platform can't handling uint correctly. use 64bit machine.");
         }
 
-        $this->bb->putUintX($this->space -= 4, $x);
+        $this->bb->putUint($this->space -= 4, $x);
     }
 
     /**
@@ -238,7 +240,7 @@ class FlatbufferBuilder
             throw new \OverflowException("your platform can't handling long correctly. use 64bit machine.");
         }
 
-        $this->bb->putLongX($this->space -= 8, $x);
+        $this->bb->putLong($this->space -= 8, $x);
     }
 
     /**
@@ -250,7 +252,7 @@ class FlatbufferBuilder
             throw new \OverflowException("your platform can't handling ulong correctly. this is php limitations. please wait extension release.");
         }
 
-        $this->bb->putUlongX($this->space -= 8, $x);
+        $this->bb->putUlong($this->space -= 8, $x);
     }
 
     /**
@@ -258,7 +260,7 @@ class FlatbufferBuilder
      */
     public function putFloat($x)
     {
-        $this->bb->putFloatX($this->space -= 4, $x);
+        $this->bb->putFloat($this->space -= 4, $x);
     }
 
     /**
@@ -266,7 +268,7 @@ class FlatbufferBuilder
      */
     public function putDouble($x)
     {
-        $this->bb->putDoubleX($this->space -= 8, $x);
+        $this->bb->putDouble($this->space -= 8, $x);
     }
 
     /**
@@ -631,7 +633,7 @@ class FlatbufferBuilder
                 ($bytes[$j+2] >= "\x80" && $bytes[$j+2] <= "\xBF") &&
                 ($bytes[$j+3] >= "\x80" && $bytes[$j+3] <= "\xBF")) {
                 $j += 4;
-                $i+3;
+                $i += 3;
                 continue;
             }
 
@@ -644,7 +646,7 @@ class FlatbufferBuilder
                 $bytes[$j+3] >= "\x80" && $bytes[$j+3] <= "\xBF"
             ) {
                 $j += 4;
-                $i+=3;
+                $i += 3;
                 continue;
             }
 
@@ -656,7 +658,7 @@ class FlatbufferBuilder
                 ($bytes[$j+3] >= "\x80" && $bytes[$j+3] <= "\xBF")
             ) {
                 $bytes += 4;
-                $i+=3;
+                $i += 3;
                 continue;
             }
 
@@ -812,7 +814,7 @@ class FlatbufferBuilder
             // Found a match:
             // Remove the current vtable
             $this->space = $this->bb->capacity() - $vtableloc;
-            $this->bb->putIntX($this->space, $existing_vtable - $vtableloc);
+            $this->bb->putInt($this->space, $existing_vtable - $vtableloc);
         } else {
             // No Match:
             // Add the location of the current vtable to the list of vtables
@@ -825,7 +827,7 @@ class FlatbufferBuilder
                 }
             }
             $this->vtables[$this->num_vtables++] = $this->offset();
-            $this->bb->putIntX($this->bb->capacity() - $vtableloc, $this->offset() - $vtableloc);
+            $this->bb->putInt($this->bb->capacity() - $vtableloc, $this->offset() - $vtableloc);
         }
 
         $this->nested = false;
@@ -869,14 +871,14 @@ class FlatbufferBuilder
 
             for ($i = Constants::FILE_IDENTIFIER_LENGTH - 1; $i >= 0;
                   $i--) {
-                $this->AddByte(ord($identifier[$i]));
+                $this->addByte(ord($identifier[$i]));
             }
             $this->finish($root_table);
         }
     }
 
     /**
-     * @param bool s$forceDefaults
+     * @param bool $forceDefaults
      */
     public function forceDefaults($forceDefaults)
     {
@@ -892,7 +894,7 @@ class FlatbufferBuilder
     }
 
     /**
-     * @return initial|int
+     * @return int
      */
     public function dataStart()
     {

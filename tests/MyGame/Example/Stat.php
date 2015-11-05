@@ -59,7 +59,7 @@ class Stat extends Table
     public function getVal()
     {
         $o = $this->__offset(6);
-        return $o != 0 ? $this->bb->GetLong($o + $this->bb_pos) : 0;
+        return $o != 0 ? $this->bb->getLong($o + $this->bb_pos) : 0;
     }
 
     /**
@@ -68,7 +68,7 @@ class Stat extends Table
     public function getCount()
     {
         $o = $this->__offset(8);
-        return $o != 0 ? $this->bb->GetUshort($o + $this->bb_pos) : 0;
+        return $o != 0 ? $this->bb->getUshort($o + $this->bb_pos) : 0;
     }
 
     /**
