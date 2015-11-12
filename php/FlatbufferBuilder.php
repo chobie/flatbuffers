@@ -563,7 +563,7 @@ class FlatbufferBuilder
      */
     public function endVector()
     {
-        $this->putInt($this->vector_num_elems);
+        $this->putUint($this->vector_num_elems);
         return $this->offset();
     }
 
