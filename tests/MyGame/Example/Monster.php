@@ -367,7 +367,7 @@ class Monster extends Table
      * @param int
      * @return void
      */
-    public static function AddPos(FlatBufferBuilder $builder, $pos)
+    public static function addPos(FlatBufferBuilder $builder, $pos)
     {
         $builder->addStructX(0, $pos, 0);
     }
@@ -377,7 +377,7 @@ class Monster extends Table
      * @param short
      * @return void
      */
-    public static function AddMana(FlatBufferBuilder $builder, $mana)
+    public static function addMana(FlatBufferBuilder $builder, $mana)
     {
         $builder->addShortX(1, $mana, 150);
     }
@@ -387,7 +387,7 @@ class Monster extends Table
      * @param short
      * @return void
      */
-    public static function AddHp(FlatBufferBuilder $builder, $hp)
+    public static function addHp(FlatBufferBuilder $builder, $hp)
     {
         $builder->addShortX(2, $hp, 100);
     }
@@ -397,7 +397,7 @@ class Monster extends Table
      * @param StringOffset
      * @return void
      */
-    public static function AddName(FlatBufferBuilder $builder, $name)
+    public static function addName(FlatBufferBuilder $builder, $name)
     {
         $builder->addOffsetX(3, $name, 0);
     }
@@ -407,7 +407,7 @@ class Monster extends Table
      * @param VectorOffset
      * @return void
      */
-    public static function AddInventory(FlatBufferBuilder $builder, $inventory)
+    public static function addInventory(FlatBufferBuilder $builder, $inventory)
     {
         $builder->addOffsetX(5, $inventory, 0);
     }
@@ -441,7 +441,7 @@ class Monster extends Table
      * @param sbyte
      * @return void
      */
-    public static function AddColor(FlatBufferBuilder $builder, $color)
+    public static function addColor(FlatBufferBuilder $builder, $color)
     {
         $builder->addSbyteX(6, $color, 8);
     }
@@ -451,7 +451,7 @@ class Monster extends Table
      * @param byte
      * @return void
      */
-    public static function AddTestType(FlatBufferBuilder $builder, $testType)
+    public static function addTestType(FlatBufferBuilder $builder, $testType)
     {
         $builder->addByteX(7, $testType, 0);
     }
@@ -466,7 +466,7 @@ class Monster extends Table
      * @param VectorOffset
      * @return void
      */
-    public static function AddTest4(FlatBufferBuilder $builder, $test4)
+    public static function addTest4(FlatBufferBuilder $builder, $test4)
     {
         $builder->addOffsetX(9, $test4, 0);
     }
@@ -500,7 +500,7 @@ class Monster extends Table
      * @param VectorOffset
      * @return void
      */
-    public static function AddTestarrayofstring(FlatBufferBuilder $builder, $testarrayofstring)
+    public static function addTestarrayofstring(FlatBufferBuilder $builder, $testarrayofstring)
     {
         $builder->addOffsetX(10, $testarrayofstring, 0);
     }
@@ -534,7 +534,7 @@ class Monster extends Table
      * @param VectorOffset
      * @return void
      */
-    public static function AddTestarrayoftables(FlatBufferBuilder $builder, $testarrayoftables)
+    public static function addTestarrayoftables(FlatBufferBuilder $builder, $testarrayoftables)
     {
         $builder->addOffsetX(11, $testarrayoftables, 0);
     }
@@ -568,7 +568,7 @@ class Monster extends Table
      * @param int
      * @return void
      */
-    public static function AddEnemy(FlatBufferBuilder $builder, $enemy)
+    public static function addEnemy(FlatBufferBuilder $builder, $enemy)
     {
         $builder->addOffsetX(12, $enemy, 0);
     }
@@ -578,7 +578,7 @@ class Monster extends Table
      * @param VectorOffset
      * @return void
      */
-    public static function AddTestnestedflatbuffer(FlatBufferBuilder $builder, $testnestedflatbuffer)
+    public static function addTestnestedflatbuffer(FlatBufferBuilder $builder, $testnestedflatbuffer)
     {
         $builder->addOffsetX(13, $testnestedflatbuffer, 0);
     }
@@ -612,7 +612,7 @@ class Monster extends Table
      * @param int
      * @return void
      */
-    public static function AddTestempty(FlatBufferBuilder $builder, $testempty)
+    public static function addTestempty(FlatBufferBuilder $builder, $testempty)
     {
         $builder->addOffsetX(14, $testempty, 0);
     }
@@ -622,7 +622,7 @@ class Monster extends Table
      * @param bool
      * @return void
      */
-    public static function AddTestbool(FlatBufferBuilder $builder, $testbool)
+    public static function addTestbool(FlatBufferBuilder $builder, $testbool)
     {
         $builder->addBoolX(15, $testbool, false);
     }
@@ -632,7 +632,7 @@ class Monster extends Table
      * @param int
      * @return void
      */
-    public static function AddTesthashs32Fnv1(FlatBufferBuilder $builder, $testhashs32Fnv1)
+    public static function addTesthashs32Fnv1(FlatBufferBuilder $builder, $testhashs32Fnv1)
     {
         $builder->addIntX(16, $testhashs32Fnv1, 0);
     }
@@ -642,7 +642,7 @@ class Monster extends Table
      * @param uint
      * @return void
      */
-    public static function AddTesthashu32Fnv1(FlatBufferBuilder $builder, $testhashu32Fnv1)
+    public static function addTesthashu32Fnv1(FlatBufferBuilder $builder, $testhashu32Fnv1)
     {
         $builder->addUintX(17, $testhashu32Fnv1, 0);
     }
@@ -652,7 +652,7 @@ class Monster extends Table
      * @param long
      * @return void
      */
-    public static function AddTesthashs64Fnv1(FlatBufferBuilder $builder, $testhashs64Fnv1)
+    public static function addTesthashs64Fnv1(FlatBufferBuilder $builder, $testhashs64Fnv1)
     {
         $builder->addLongX(18, $testhashs64Fnv1, 0);
     }
@@ -662,7 +662,7 @@ class Monster extends Table
      * @param ulong
      * @return void
      */
-    public static function AddTesthashu64Fnv1(FlatBufferBuilder $builder, $testhashu64Fnv1)
+    public static function addTesthashu64Fnv1(FlatBufferBuilder $builder, $testhashu64Fnv1)
     {
         $builder->addUlongX(19, $testhashu64Fnv1, 0);
     }
@@ -672,7 +672,7 @@ class Monster extends Table
      * @param int
      * @return void
      */
-    public static function AddTesthashs32Fnv1a(FlatBufferBuilder $builder, $testhashs32Fnv1a)
+    public static function addTesthashs32Fnv1a(FlatBufferBuilder $builder, $testhashs32Fnv1a)
     {
         $builder->addIntX(20, $testhashs32Fnv1a, 0);
     }
@@ -682,7 +682,7 @@ class Monster extends Table
      * @param uint
      * @return void
      */
-    public static function AddTesthashu32Fnv1a(FlatBufferBuilder $builder, $testhashu32Fnv1a)
+    public static function addTesthashu32Fnv1a(FlatBufferBuilder $builder, $testhashu32Fnv1a)
     {
         $builder->addUintX(21, $testhashu32Fnv1a, 0);
     }
@@ -692,7 +692,7 @@ class Monster extends Table
      * @param long
      * @return void
      */
-    public static function AddTesthashs64Fnv1a(FlatBufferBuilder $builder, $testhashs64Fnv1a)
+    public static function addTesthashs64Fnv1a(FlatBufferBuilder $builder, $testhashs64Fnv1a)
     {
         $builder->addLongX(22, $testhashs64Fnv1a, 0);
     }
@@ -702,7 +702,7 @@ class Monster extends Table
      * @param ulong
      * @return void
      */
-    public static function AddTesthashu64Fnv1a(FlatBufferBuilder $builder, $testhashu64Fnv1a)
+    public static function addTesthashu64Fnv1a(FlatBufferBuilder $builder, $testhashu64Fnv1a)
     {
         $builder->addUlongX(23, $testhashu64Fnv1a, 0);
     }
@@ -712,7 +712,7 @@ class Monster extends Table
      * @param VectorOffset
      * @return void
      */
-    public static function AddTestarrayofbools(FlatBufferBuilder $builder, $testarrayofbools)
+    public static function addTestarrayofbools(FlatBufferBuilder $builder, $testarrayofbools)
     {
         $builder->addOffsetX(24, $testarrayofbools, 0);
     }

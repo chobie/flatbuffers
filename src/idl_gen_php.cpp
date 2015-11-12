@@ -524,7 +524,7 @@ namespace php {
       code += Indent + " * @return void\n";
       code += Indent + " */\n";
       code += Indent + "public static function ";
-      code += "Add" + MakeCamel(field.name);
+      code += "add" + MakeCamel(field.name);
       code += "(FlatBufferBuilder $builder, ";
       code += "$" + MakeCamel(field.name, false);
       code += ")\n";

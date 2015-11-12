@@ -99,7 +99,7 @@ class Stat extends Table
      * @param StringOffset
      * @return void
      */
-    public static function AddId(FlatBufferBuilder $builder, $id)
+    public static function addId(FlatBufferBuilder $builder, $id)
     {
         $builder->addOffsetX(0, $id, 0);
     }
@@ -109,7 +109,7 @@ class Stat extends Table
      * @param long
      * @return void
      */
-    public static function AddVal(FlatBufferBuilder $builder, $val)
+    public static function addVal(FlatBufferBuilder $builder, $val)
     {
         $builder->addLongX(1, $val, 0);
     }
@@ -119,7 +119,7 @@ class Stat extends Table
      * @param ushort
      * @return void
      */
-    public static function AddCount(FlatBufferBuilder $builder, $count)
+    public static function addCount(FlatBufferBuilder $builder, $count)
     {
         $builder->addUshortX(2, $count, 0);
     }

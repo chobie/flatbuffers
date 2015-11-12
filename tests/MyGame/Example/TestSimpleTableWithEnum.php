@@ -82,7 +82,7 @@ class TestSimpleTableWithEnum extends Table
      * @param sbyte
      * @return void
      */
-    public static function AddColor(FlatBufferBuilder $builder, $color)
+    public static function addColor(FlatBufferBuilder $builder, $color)
     {
         $builder->addSbyteX(0, $color, 2);
     }
