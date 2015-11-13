@@ -349,6 +349,14 @@ function testByteBuffer(Assert $assert) {
     $assert->Equal(chr(0x01), $uut->_buffer[0]);
     $assert->Equal(chr(0x00), $uut->_buffer[1]);
 
+    $buffer = str_repeat("\0", 2);
+    $uut = Google\FlatBuffers\ByteBuffer::wrap($buffer);
+    $uut->putShort(0, -32768);
+
+    // Ensure Endiannes was written correctly
+    $assert->Equal(chr(0x00), $uut->_buffer[0]);
+    $assert->Equal(chr(0x80), $uut->_buffer[1]);
+
     //Test: ByteBuffer_PutShortCannotPutAtOffsetPastLength
     $buffer = "\0";
     $uut = Google\FlatBuffers\ByteBuffer::wrap($buffer);
@@ -378,6 +386,14 @@ function testByteBuffer(Assert $assert) {
     $assert->Equal(chr(0x0C), $uut->_buffer[1]);
     $assert->Equal(chr(0x0B), $uut->_buffer[2]);
     $assert->Equal(chr(0x0A), $uut->_buffer[3]);
+
+    $buffer = str_repeat("\0", 4);
+    $uut = Google\FlatBuffers\ByteBuffer::wrap($buffer);
+    $uut->putInt(0, -2147483648);
+    $assert->Equal(chr(0x00), $uut->_buffer[0]);
+    $assert->Equal(chr(0x00), $uut->_buffer[1]);
+    $assert->Equal(chr(0x00), $uut->_buffer[2]);
+    $assert->Equal(chr(0x80), $uut->_buffer[3]);
 
     //Test: ByteBuffer_PutIntCannotPutAtOffsetPastLength
     $buffer = str_repeat("\0", 4);
@@ -457,6 +473,13 @@ function testByteBuffer(Assert $assert) {
     $uut = Google\FlatBuffers\ByteBuffer::wrap($buffer);
     $assert->Equal(1, $uut->getShort(0));
 
+    //Test: ByteBuffer_GetShortReturnsCorrectData (signed value)
+    $buffer = str_repeat("\0", 2);
+    $buffer[0] = chr(0x00);
+    $buffer[1] = chr(0x80);
+    $uut = Google\FlatBuffers\ByteBuffer::wrap($buffer);
+    $assert->Equal(-32768, $uut->getShort(0));
+
     //Test: ByteBuffer_GetShortChecksOffset
     $buffer = str_repeat("\0", 2);
     $uut = Google\FlatBuffers\ByteBuffer::wrap($buffer);
@@ -480,8 +503,17 @@ function testByteBuffer(Assert $assert) {
     $uut = Google\FlatBuffers\ByteBuffer::wrap($buffer);
     $assert->Equal(0x0A0B0C0D, $uut->getInt(0));
 
+    $buffer = str_repeat("\0", 4);
+    $buffer[0] = chr(0x00);
+    $buffer[1] = chr(0x00);
+    $buffer[2] = chr(0x00);
+    $buffer[3] = chr(0x80);
+    $uut = Google\FlatBuffers\ByteBuffer::wrap($buffer);
+    $assert->Equal(-2147483648, $uut->getInt(0));
+
     //Test: ByteBuffer_GetIntChecksOffset
     $buffer = str_repeat("\0", 4);
+
     $uut = Google\FlatBuffers\ByteBuffer::wrap($buffer);
     $assert->Throws(new OutOfRangeException(), function()  use ($uut) {
         $uut->getInt(4);
@@ -523,10 +555,24 @@ function testByteBuffer(Assert $assert) {
         $uut->getLong(0);
     });
 
-    // these tests are not necessary as we can't use unsafe operation.
-    //Test: ByteBuffer_ReverseBytesUshort
-    //Test: ByteBuffer_ReverseBytesUint
-    //Test: ByteBuffer_ReverseBytesUlong
+    //Test: big endian
+    $buffer = str_repeat("\0", 2);
+    // 0xFF 0x00
+    // Little Endian: 255
+    // Big Endian: 65280
+    $buffer[0] = chr(0xff);
+    $buffer[1] = chr(0x00);
+    $uut = Google\FlatBuffers\ByteBuffer::wrap($buffer);
+    $assert->Equal(65280, $uut->readLittleEndian(0, 2, true));
+
+    $buffer = str_repeat("\0", 4);
+    $buffer[0] = chr(0x0D);
+    $buffer[1] = chr(0x0C);
+    $buffer[2] = chr(0x0B);
+    $buffer[3] = chr(0x0A);
+    $uut = Google\FlatBuffers\ByteBuffer::wrap($buffer);
+    $assert->Equal(0x0D0C0B0A, $uut->readLittleEndian(0, 4, true));
+
 }
 
 class Assert {

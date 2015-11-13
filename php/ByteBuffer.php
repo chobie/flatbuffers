@@ -137,12 +137,12 @@ class ByteBuffer
      * @param $count acutal size
      * @return int
      */
-    public function readLittleEndian($offset, $count)
+    public function readLittleEndian($offset, $count, $force_bigendian = false)
     {
         $this->assertOffsetAndLength($offset, $count);
         $r = 0;
 
-        if (ByteBuffer::isLittleEndian()) {
+        if (ByteBuffer::isLittleEndian() && $force_bigendian == false) {
             for ($i = 0; $i < $count; $i++) {
                 $r |= ord($this->_buffer[$offset + $i]) << $i * 8;
             }
@@ -349,10 +349,8 @@ class ByteBuffer
     public function getShort($index)
     {
         $result = $this->readLittleEndian($index, 2);
-        $helper = pack("v", $result);
-        $v = unpack("s", $helper);
 
-        return $v[1];
+        return self::convertHelper(self::__SHORT, $result);
     }
 
     /**
@@ -372,9 +370,7 @@ class ByteBuffer
     {
         $result = $this->readLittleEndian($index, 4);
 
-        $helper = pack("V", $result);
-        $v = unpack("l", $helper);
-        return $v[1];
+        return self::convertHelper(self::__INT, $result);
     }
 
     /**
@@ -394,9 +390,7 @@ class ByteBuffer
     {
         $result =  $this->readLittleEndian($index, 8);
 
-        $helper = pack("P", $result);
-        $v = unpack("q", $helper);
-        return $v[1];
+        return self::convertHelper(self::__LONG, $result);
     }
 
     /**
@@ -415,10 +409,8 @@ class ByteBuffer
     public function getFloat($index)
     {
         $i = $this->readLittleEndian($index, 4);
-        $inthelper = pack("V", $i);
-        $v = unpack("f", $inthelper);
 
-        return $v[1];
+        return self::convertHelper(self::__FLOAT, $i);
     }
 
     /**
@@ -429,9 +421,50 @@ class ByteBuffer
     {
         $i = $this->readLittleEndian($index, 4);
         $i2 = $this->readLittleEndian($index + 4, 4);
-        $inthelper = pack("VV", $i, $i2);
-        $v = unpack("d", $inthelper);
 
-        return $v[1];
+        return self::convertHelper(self::__DOUBLE, $i, $i2);
+    }
+
+    const __SHORT = 1;
+    const __INT = 2;
+    const __LONG = 3;
+    const __FLOAT = 4;
+    const __DOUBLE = 5;
+    private static function convertHelper($type, $value, $value2 = null) {
+        // readLittleEndian construct unsigned integer value from bytes. we have to encode this value to
+        // correct bytes, and decode as expected types with `unpack` function.
+        // then it returns correct type value.
+        // see also: http://php.net/manual/en/function.pack.php
+
+        switch ($type) {
+            case self::__SHORT:
+                $helper = pack("v", $value);
+                $v = unpack("s", $helper);
+
+                return $v[1];
+                break;
+            case self::__INT:
+                $helper = pack("V", $value);
+                $v = unpack("l", $helper);
+                return $v[1];
+                break;
+            case self::__LONG:
+                $helper = pack("P", $value);
+                $v = unpack("q", $helper);
+                return $v[1];
+                break;
+            case self::__FLOAT:
+                $inthelper = pack("V", $value);
+                $v = unpack("f", $inthelper);
+                return $v[1];
+                break;
+            case self::__DOUBLE:
+                $inthelper = pack("VV", $value, $value2);
+                $v = unpack("d", $inthelper);
+                return $v[1];
+                break;
+            default:
+                throw new \Exception(sprintf("unexpected type %d specified", $type));
+        }
     }
 }
