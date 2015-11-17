@@ -1,12 +1,13 @@
-# Use in Java/C-sharp
+# Use in Java/C-sharp/PHP
 
 FlatBuffers supports reading and writing binary FlatBuffers in Java and C#.
 Generate code for Java with the `-j` option to `flatc`, or for C# with `-n`
-(think .Net).
+(think .Net). for PHP with `--php`.
 
 Note that this document is from the perspective of Java. Code for both languages
 is generated in the same way, with only minor differences. These differences
 are [explained in a section below](#differences-in-c-sharp).
+PHP API design respects Java and C#. also [explained in a section below](#diffrences-in-php)
 
 See `javaTest.java` for an example. Essentially, you read a FlatBuffer binary
 file into a `byte[]`, which you then turn into a `ByteBuffer`, which you pass to
@@ -170,6 +171,42 @@ are prefixed with `Get`, e.g.:
     monster.GetPos(preconstructedPos);
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+## Differences in PHP
+
+PHP code works almost identically to Java and C#, Basically, replace dot to arrow operator.
+You can see an example of PHP code in `tests/phpTest.php`. , and also there is no generics. 
+
+First of all, naming follows standard PSR-2 style with `camelCasing` identifiers,
+e.g. `getRootAsMyRootType`. Also, values (except vectors and unions) are prefixed 
+with `get` as avoiding reserved words.
+
+### Composer support
+
+Currently, PHP implementation is still experimental. please add repositories 
+section to your composer.json like below example.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.js}
+{
+    "repositories": [{
+        "type": "vcs",
+        "url": "https://github.com/google/flatbuffers"
+    }],
+    "require": {
+        "google/flatbuffers": "*"
+    }
+}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+### PHP Limitation / Performance Design
+
+PHP integer size are platform dependant. this means 32bit platform (includes win64)
+can not use uint, long and ulong values which overs ~PHP_INT_MAX - PHP_INT_MAX due to overflow problem.
+
+please keep your mind above note when you communicate with PHP server.
+
+
+PHP5 are slower decoding/encoding than other implementations. as it has slightly function call overhead.
+binary operation requires many chr/ord call on PHP, so this is expected performance.
 
 ## Text parsing
 
