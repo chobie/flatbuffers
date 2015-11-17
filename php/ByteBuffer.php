@@ -175,6 +175,8 @@ class ByteBuffer
      */
     public function putSbyte($offset, $value)
     {
+        self::validateValue(-128, 127, $value, "sbyte");
+
         $length = strlen($value);
         $this->assertOffsetAndLength($offset, $length);
         return $this->_buffer[$offset] = $value;
@@ -187,6 +189,8 @@ class ByteBuffer
      */
     public function putByte($offset, $value)
     {
+        self::validateValue(0, 255, $value, "byte");
+
         $length = strlen($value);
         $this->assertOffsetAndLength($offset, $length);
         return $this->_buffer[$offset] = $value;
@@ -211,6 +215,8 @@ class ByteBuffer
      */
     public function putShort($offset, $value)
     {
+        self::validateValue(-32768, 32767, $value, "short");
+
         $this->assertOffsetAndLength($offset, 2);
         $this->writeLittleEndian($offset, 2, $value);
     }
@@ -221,6 +227,8 @@ class ByteBuffer
      */
     public function putUshort($offset, $value)
     {
+        self::validateValue(0, 65535, $value, "short");
+
         $this->assertOffsetAndLength($offset, 2);
         $this->writeLittleEndian($offset, 2, $value);
     }
@@ -231,6 +239,8 @@ class ByteBuffer
      */
     public function putInt($offset, $value)
     {
+        self::validateValue(~PHP_INT_MAX,  PHP_INT_MAX, $value, "int");
+
         $this->assertOffsetAndLength($offset, 4);
         $this->writeLittleEndian($offset, 4, $value);
     }
@@ -241,6 +251,9 @@ class ByteBuffer
      */
     public function putUint($offset, $value)
     {
+        // NOTE: We can't put big integer value. this is PHP limitation.
+        self::validateValue(0,  PHP_INT_MAX, $value, "uint",  " php has big numbers limitation. check your PHP_INT_MAX");
+
         $this->assertOffsetAndLength($offset, 4);
         $this->writeLittleEndian($offset, 4, $value);
     }
@@ -251,6 +264,9 @@ class ByteBuffer
      */
     public function putLong($offset, $value)
     {
+        // NOTE: We can't put big integer value. this is PHP limitation.
+        self::validateValue(~PHP_INT_MAX, PHP_INT_MAX, $value, "long",  " php has big numbers limitation. check your PHP_INT_MAX");
+
         $this->assertOffsetAndLength($offset, 8);
         $this->writeLittleEndian($offset, 8, $value);
     }
@@ -261,6 +277,9 @@ class ByteBuffer
      */
     public function putUlong($offset, $value)
     {
+        // NOTE: We can't put big integer value. this is PHP limitation.
+        self::validateValue(0, PHP_INT_MAX, $value, "long", " php has big numbers limitation. check your PHP_INT_MAX");
+
         $this->assertOffsetAndLength($offset, 8);
         $this->writeLittleEndian($offset, 8, $value);
     }
@@ -465,6 +484,12 @@ class ByteBuffer
                 break;
             default:
                 throw new \Exception(sprintf("unexpected type %d specified", $type));
+        }
+    }
+
+    private static function validateValue($min, $max, $value, $type, $additional_notes = "") {
+        if(!($min <= $value && $value <= $max)) {
+            throw new \InvalidArgumentException(sprintf("bad number %s for type %s.%s", $value, $type, $additional_notes));
         }
     }
 }
